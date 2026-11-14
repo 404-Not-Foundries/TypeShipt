@@ -1,64 +1,74 @@
+// Shipt-style product card for one need. Owner: mulimangila.
 import Link from "next/link";
+import { formatUsd } from "@/lib/fees";
 import type { Need, Partner } from "@/lib/types";
+import { CategoryArt } from "./category-art";
 import { type Helpers, helpersLine, isLastFew } from "./community";
-import { ProgressMeter } from "./progress-meter";
-import { UrgencyBadge } from "./urgency-badge";
 
-const formatDeadline = (iso: string) =>
-  new Date(iso).toLocaleString("en-US", { weekday: "short", hour: "numeric", minute: "2-digit", timeZone: "America/Chicago" });
+type Props = {
+  need: Need;
+  partner?: Partner;
+  category?: string;
+  price?: number;
+  helpers?: Helpers;
+  onFill: (need: Need) => void;
+  className?: string;
+  /** Tile label for weather-surged needs, e.g. "Cold night" or "Heat alert". */
+  surgeLabel?: string;
+};
 
-type Props = { need: Need; partner?: Partner; category?: string; helpers?: Helpers; onFill: (need: Need) => void };
+function TilePill({ need, surgeLabel }: { need: Need; surgeLabel: string }) {
+  const remaining = need.qtyNeeded - need.qtyPledged;
+  if (remaining <= 0) return <span className="rounded-full bg-express px-2.5 py-1 text-xs font-semibold text-express">Filled together</span>;
+  if (isLastFew(need)) return <span className="rounded-full bg-primary px-2.5 py-1 text-xs font-semibold text-white">Only {remaining} left</span>;
+  if (need.urgency === "urgent") return <span className="rounded-full bg-sale px-2.5 py-1 text-xs font-semibold text-white">{need.surgeReason ? surgeLabel : "Urgent"}</span>;
+  if (need.urgency === "high") return <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-primary">High need</span>;
+  return null;
+}
 
-export function NeedCard({ need, partner, category, helpers, onFill }: Props) {
+export function NeedCard({ need, partner, category, price, helpers, onFill, className = "", surgeLabel = "Weather alert" }: Props) {
   const remaining = Math.max(0, need.qtyNeeded - need.qtyPledged);
   const closed = remaining === 0;
-  const lastFew = isLastFew(need);
+  const pct = need.qtyNeeded > 0 ? Math.min(100, Math.round((need.qtyPledged / need.qtyNeeded) * 100)) : 0;
   const who = helpersLine(helpers);
-  const label = closed ? "Filled together — thank you!" : who ? `Join them (${remaining} left)` : `Fill this need (${remaining} left)`;
+
   return (
-    <li className={`flex flex-col gap-3 rounded-2xl border bg-white p-4 ${lastFew ? "border-2 border-primary" : "border-hairline"}`}>
-      {lastFew && (
-        <p className="-mx-4 -mt-4 rounded-t-2xl bg-primary px-4 py-2 text-sm font-semibold text-white">
-          Only {remaining} left. Finish it together 🤝
-        </p>
-      )}
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <h3 className="font-semibold leading-snug">{need.title}</h3>
-          {partner && (
-            <Link href={`/p/${partner.id}`} className="text-sm text-primary hover:underline">
-              {partner.name}
-            </Link>
-          )}
-          {category && <span className="text-sm text-secondary"> · {category}</span>}
-        </div>
-        <UrgencyBadge urgency={need.urgency} />
-      </div>
-      {need.surgeReason && <p className="rounded-xl bg-hero-sage px-3 py-2 text-sm font-medium text-primary">{need.surgeReason}</p>}
-      <ProgressMeter pledged={need.qtyPledged} needed={need.qtyNeeded} received={need.qtyReceived} />
-      {who && (
-        <p className="flex items-center gap-2 text-sm">
-          <span aria-hidden className="flex -space-x-1.5">
-            {(helpers?.names.length ? helpers.names : ["?"]).slice(0, 3).map((n) => (
-              <span key={n} className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-totemeal text-[11px] font-bold">
-                {n[0]?.toUpperCase()}
-              </span>
-            ))}
-          </span>
-          <span>
-            <strong className="font-semibold">{who}</strong> {closed ? "filled this together" : (helpers?.people ?? 0) === 1 ? "is filling this" : "are filling this"}
-          </span>
-        </p>
-      )}
-      {need.deadline && <p className="text-xs text-secondary">Needed by {formatDeadline(need.deadline)}</p>}
+    <li className={`flex flex-col ${className}`}>
       <button
         type="button"
-        disabled={closed}
         onClick={() => onFill(need)}
-        className="mt-auto rounded-full bg-primary px-4 py-2.5 font-medium text-white hover:bg-black disabled:cursor-not-allowed disabled:bg-hairline disabled:text-secondary"
+        disabled={closed}
+        aria-label={closed ? `${need.title}: filled` : `Fill ${need.title} for ${partner?.name ?? "this partner"}, ${remaining} left`}
+        className="group relative block overflow-hidden rounded-2xl text-left disabled:cursor-default"
       >
-        {label}
+        <CategoryArt category={category} className="aspect-[4/3] w-full transition-transform group-enabled:group-hover:scale-[1.03]" />
+        <span className="absolute left-2.5 top-2.5">
+          <TilePill need={need} surgeLabel={surgeLabel} />
+        </span>
+        {!closed && (
+          <span className="absolute bottom-2.5 right-2.5 flex h-10 w-10 items-center justify-center rounded-full border border-primary bg-white text-2xl leading-none shadow-float group-hover:bg-primary group-hover:text-white">
+            +
+          </span>
+        )}
       </button>
+      <div className="mt-2 space-y-1 px-0.5">
+        {price !== undefined && <p className="font-bold">about {formatUsd(price)} each</p>}
+        <h3 className="line-clamp-2 text-[15px] leading-snug">{need.title}</h3>
+        {partner && (
+          <Link href={`/p/${partner.id}`} className="block truncate text-[13px] text-secondary hover:text-primary hover:underline">
+            {partner.name}
+          </Link>
+        )}
+        <div className="flex items-center gap-2 pt-0.5" aria-label={`${need.qtyPledged} of ${need.qtyNeeded} pledged`}>
+          <span className="h-1 flex-1 overflow-hidden rounded-full bg-hairline">
+            <span className="block h-full rounded-full bg-[var(--accent-express-text)]" style={{ width: `${pct}%` }} />
+          </span>
+          <span className="shrink-0 text-xs text-secondary">
+            {need.qtyPledged}/{need.qtyNeeded}
+          </span>
+        </div>
+        {who && <p className="truncate text-xs text-secondary">{who} {closed ? "filled this" : "helping"}</p>}
+      </div>
     </li>
   );
 }
