@@ -1,16 +1,20 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { POST } from "@/app/api/demo/route";
 import { loadColdNight, seedDemoPledges } from "@/lib/demo";
 import { pledgeCost } from "@/lib/fees";
 import { planRoutes } from "@/lib/routing";
 import { addPledge, getState, resetState } from "@/lib/store";
 import type { Pledge } from "@/lib/types";
+import { refreshWeather } from "@/lib/weather";
 
 const choices = (pledges: Pledge[]) => pledges.map((pledge) => ({
   needId: pledge.needId, partnerId: pledge.partnerId, qty: pledge.qty,
   donorName: pledge.donorName, fulfillment: pledge.fulfillment,
   storeId: pledge.storeId, porch: pledge.porch, cost: pledge.cost, status: pledge.status,
 }));
+
+// Keep the suite offline: the reset action asks for the live forecast, which falls back when the fetch fails.
+vi.stubGlobal("fetch", () => Promise.reject(new Error("offline")));
 
 beforeEach(() => { resetState(); });
 
@@ -159,6 +163,16 @@ describe("loadColdNight", () => {
       expect(plan.routes.every((route) => route.lateStops === 0 && route.load <= route.capacity)).toBe(true);
       expect(plan.summary.minutes).toBeLessThan(plan.summary.naiveMinutes * 0.75);
     }
+  });
+
+  it("is undone by the reset action, simulated weather included", async () => {
+    await loadColdNight();
+    const response = await POST(new Request("http://localhost/api/demo", { method: "POST", body: JSON.stringify({ action: "reset" }) }));
+    expect(response.status).toBe(200);
+    await refreshWeather(); // what the donor feed does on load
+    expect(getState().pledges).toEqual([]);
+    expect(getState().weather.surge).toBe(false);
+    expect(getState().needs.some((need) => need.surgeReason)).toBe(false);
   });
 
   it("is available as POST /api/demo cold-night", async () => {
