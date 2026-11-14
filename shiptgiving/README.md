@@ -43,7 +43,7 @@ Keys are optional. `ANTHROPIC_API_KEY` goes in `shiptgiving/.env.local` and lets
 |---|---|---|
 | **Home** | `/` | What ShiptGiving is, a live strip (urgent needs, items pledged, partners, weather surge) and a card for each view below. |
 | **Give** | `/give`, `/p/[id]` | A Shipt-style feed: tonight's most urgent needs first, product cards with quick add, search and categories, and a live strip with the weather and recent pledges. Cards show which neighbors are already helping. The fill-a-need sheet covers quantity, the three delivery options, store picker and cost breakdown. Also partner pages, your pledges, and a written acknowledgment once the partner confirms receipt. |
-| **Nonprofits** | `/partner` | Nonprofit staff post a need in plain English ("cold front tonight, need 40 pairs of men's socks"), see incoming pledges, and confirm receipt. Includes the Weather Surge panel, accept rules, dorm kits and the confidential-address notice. |
+| **Nonprofits** | `/partner` | Nonprofit staff post a need in plain English ("cold front tonight, need 40 pairs of men's socks"), see incoming pledges, and confirm receipt. Includes the Weather Surge panel, accept rules, dorm kits, the confidential-address notice, and a verification card (EIN, 501(c)(3) status, name and city checked against IRS records). |
 | **Drivers** | `/driver` | "Tomorrow's drivers" (add or remove vehicles), Generate routes, a banner with the time and miles saved, a map with one color per route, and route cards with load, ETAs, late badges and Mark picked up / Mark delivered. |
 | **Impact** | `/impact` | Items pledged and delivered, partners helped, value of goods, trips, minutes and miles saved by routing, progress per partner, recent activity. |
 | **Shipt concept** | `/shipt`, `/shipt/order/[id]` | What ShiptGiving could look like as a section of the Shipt app: urgent needs, neighborhood stores, your community orders and order tracking. A mock; nothing is purchased or sent to Shipt. |
@@ -82,6 +82,7 @@ All views read the same state and refresh every 2 seconds, so a pledge made in o
 | Kroger Developer API | Live shelf prices (optional) | Free account |
 | OSRM public server | The road line drawn for each route | No |
 | National Weather Service (api.weather.gov) | Tonight's low and heat alerts, which trigger the Weather Surge | No |
+| ProPublica Nonprofit Explorer (IRS exempt-organization records) | A snapshot used to verify each partner; partners with no confirmed record stay unverified | No |
 | Claude (Anthropic API) | Turning a nonprofit's plain-text need into catalog items | Yes (keyword fallback without it) |
 
 Shipt has no public consumer API, so "Send via Shipt" is a mock of Shipt's existing gift-order checkout. No real payments happen.
