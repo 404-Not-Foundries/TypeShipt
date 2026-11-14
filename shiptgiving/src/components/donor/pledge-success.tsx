@@ -1,4 +1,4 @@
-import { formatUsd } from "@/lib/fees";
+import { amountCharged, formatUsd } from "@/lib/fees";
 import type { Partner, Pledge } from "@/lib/types";
 import { dropOff } from "./geo";
 
@@ -20,7 +20,7 @@ export function PledgeSuccess({ pledge, partner, title, onClose }: Props) {
       <p className="text-sm text-neutral-600">{NEXT[pledge.fulfillment]}</p>
       {pledge.fulfillment === "volunteer" && <p className="text-sm">Drop-off: {dropOff(partner).address}</p>}
       <p className="text-sm">
-        {pledge.fulfillment === "volunteer" ? "Estimated value" : "Charged"}: <strong>{formatUsd(pledge.cost.total)}</strong>
+        You pay: <strong>{formatUsd(amountCharged(pledge.cost, pledge.fulfillment))}</strong>
       </p>
       <button type="button" onClick={onClose} className="w-full rounded-full bg-emerald-700 py-3 font-semibold text-white">
         Done

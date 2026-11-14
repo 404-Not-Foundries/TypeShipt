@@ -1,13 +1,16 @@
-import { formatUsd } from "@/lib/fees";
-import type { PledgeCost } from "@/lib/types";
+import { amountCharged, formatUsd } from "@/lib/fees";
+import type { Fulfillment, PledgeCost } from "@/lib/types";
 
-export function CostBreakdown({ cost, donors }: { cost: PledgeCost; donors: number }) {
+type Props = { cost: PledgeCost; donors: number; fulfillment: Fulfillment };
+
+export function CostBreakdown({ cost, donors, fulfillment }: Props) {
   const row = "flex justify-between";
+  const own = fulfillment !== "shipt";
   return (
     <dl className="space-y-1 rounded-xl bg-neutral-50 p-3 text-sm">
       <div className={row}>
-        <dt>Items</dt>
-        <dd>{formatUsd(cost.items)}</dd>
+        <dt>{own ? "Value of your items (you provide them)" : "Items"}</dt>
+        <dd className={own ? "text-neutral-500" : undefined}>{formatUsd(cost.items)}</dd>
       </div>
       {cost.deliveryShare > 0 && (
         <div className={row}>
@@ -24,8 +27,8 @@ export function CostBreakdown({ cost, donors }: { cost: PledgeCost; donors: numb
         </div>
       )}
       <div className={`${row} border-t border-black/10 pt-1 font-semibold`}>
-        <dt>Total</dt>
-        <dd>{formatUsd(cost.total)}</dd>
+        <dt>You pay</dt>
+        <dd>{formatUsd(amountCharged(cost, fulfillment))}</dd>
       </div>
       {cost.deliveryShare > 0 && (
         <p className="pt-1 text-xs text-neutral-500">Your delivery share drops as more neighbors join this batch.</p>

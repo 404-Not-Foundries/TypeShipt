@@ -31,3 +31,12 @@ export function mileageValue(oneWayMiles: number): number {
 }
 
 export const formatUsd = (n: number) => `$${n.toFixed(2)}`;
+
+/**
+ * What the donor actually pays at checkout. `cost.total` (stored on the pledge) keeps the item value for
+ * receipts, but volunteers and porch donors already own the items: volunteers pay nothing, porch pays the delivery share.
+ */
+export function amountCharged(cost: PledgeCost, fulfillment: Fulfillment): number {
+  if (fulfillment === "shipt") return cost.total;
+  return fulfillment === "porch" ? cost.deliveryShare : 0;
+}

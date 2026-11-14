@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { formatUsd } from "@/lib/fees";
+import { amountCharged, formatUsd } from "@/lib/fees";
 import type { AppState, PledgeStatus } from "@/lib/types";
 import { Receipt } from "./receipt";
 
@@ -29,7 +29,7 @@ export function MyPledges({ ids, state }: { ids: string[]; state: AppState }) {
             <li key={p.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
               <span className="min-w-0">
                 {p.qty} × {need?.title ?? "item"} · {partner?.name}
-                <span className="block text-xs text-neutral-600">{formatUsd(p.cost.total)}</span>
+                <span className="block text-xs text-neutral-600">{formatUsd(amountCharged(p.cost, p.fulfillment))}</span>
               </span>
               <span className="flex items-center gap-2">
                 <span className="rounded-full bg-white px-2 py-0.5 text-xs font-medium">{STATUS[p.status]}</span>
