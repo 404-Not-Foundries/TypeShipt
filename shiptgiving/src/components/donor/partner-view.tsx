@@ -47,7 +47,7 @@ export function PartnerView() {
         {open.length === 0 ? (
           <p className="rounded-2xl border border-dashed border-hairline p-8 text-center text-secondary">Every need here is fully pledged. Thank you, Birmingham!</p>
         ) : (
-          <ul className="grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 lg:grid-cols-4">
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
             {open.map((n) => (
               <NeedCard key={n.id} need={n} category={categoryOf.get(n.itemId)} price={state.catalog.find((c) => c.id === n.itemId)?.price} surgeLabel={state.weather.lowF < 40 ? "Cold night" : "Heat alert"} helpers={helpers.get(n.id)} onFill={(need) => setFillingId(need.id)} />
             ))}

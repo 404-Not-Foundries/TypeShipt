@@ -1,11 +1,11 @@
-// Shipt-style product card for one need. Owner: mulimangila.
+// Product card for one need: photo, who it is for, progress, and one obvious action. Owner: mulimangila.
 import Link from "next/link";
 import { formatUsd } from "@/lib/fees";
 import type { Need, Partner } from "@/lib/types";
 import { CheckIcon } from "@/components/partner/verified-badge";
 import { getVerification } from "@/components/partner/verification";
-import { CategoryArt } from "./category-art";
 import { type Helpers, helpersLine, isLastFew } from "./community";
+import { ItemPhoto } from "./item-photo";
 
 type Props = {
   need: Need;
@@ -17,47 +17,40 @@ type Props = {
   className?: string;
   /** Tile label for weather-surged needs, e.g. "Cold night" or "Heat alert". */
   surgeLabel?: string;
+  /** Road miles to the drop-off, shown when the feed is sorted by distance. */
+  miles?: number;
 };
+
+const PILL = "rounded-full px-2.5 py-1 text-xs font-semibold";
 
 function TilePill({ need, surgeLabel }: { need: Need; surgeLabel: string }) {
   const remaining = need.qtyNeeded - need.qtyPledged;
-  if (remaining <= 0) return <span className="rounded-full bg-express px-2.5 py-1 text-xs font-semibold text-express">Filled together</span>;
-  if (isLastFew(need)) return <span className="rounded-full bg-primary px-2.5 py-1 text-xs font-semibold text-white">Only {remaining} left</span>;
-  if (need.urgency === "urgent") return <span className="rounded-full bg-sale px-2.5 py-1 text-xs font-semibold text-white">{need.surgeReason ? surgeLabel : "Urgent"}</span>;
-  if (need.urgency === "high") return <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-primary">High need</span>;
+  if (remaining <= 0) return <span className={`${PILL} bg-express text-express`}>Filled together</span>;
+  if (isLastFew(need)) return <span className={`${PILL} bg-primary text-white`}>Only {remaining} left</span>;
+  if (need.urgency === "urgent") return <span className={`${PILL} bg-sale text-white`}>{need.surgeReason ? surgeLabel : "Urgent"}</span>;
+  if (need.urgency === "high") return <span className={`${PILL} bg-white text-primary`}>High need</span>;
   return null;
 }
 
-export function NeedCard({ need, partner, category, price, helpers, onFill, className = "", surgeLabel = "Weather alert" }: Props) {
+export function NeedCard({ need, partner, category, price, helpers, onFill, className = "", surgeLabel = "Weather alert", miles }: Props) {
   const remaining = Math.max(0, need.qtyNeeded - need.qtyPledged);
   const closed = remaining === 0;
   const pct = need.qtyNeeded > 0 ? Math.min(100, Math.round((need.qtyPledged / need.qtyNeeded) * 100)) : 0;
   const who = helpersLine(helpers);
 
   return (
-    <li className={`flex flex-col ${className}`}>
-      <button
-        type="button"
-        onClick={() => onFill(need)}
-        disabled={closed}
-        aria-label={closed ? `${need.title}: filled` : `Fill ${need.title} for ${partner?.name ?? "this partner"}, ${remaining} left`}
-        className="group relative block overflow-hidden rounded-2xl text-left disabled:cursor-default"
-      >
-        <CategoryArt category={category} className="aspect-[4/3] w-full transition-transform group-enabled:group-hover:scale-[1.03]" />
-        <span className="absolute left-2.5 top-2.5">
+    <li className={`flex flex-col overflow-hidden rounded-2xl border border-hairline bg-white ${className}`}>
+      {/* Pointer shortcut only; keyboard and screen-reader users get the Fill button below. */}
+      <div className={`relative ${closed ? "" : "cursor-pointer"}`} onClick={closed ? undefined : () => onFill(need)}>
+        <ItemPhoto itemId={need.itemId} category={category} alt="" className={`aspect-[4/3] w-full ${closed ? "opacity-60" : ""}`} />
+        <span className="absolute left-2 top-2">
           <TilePill need={need} surgeLabel={surgeLabel} />
         </span>
-        {!closed && (
-          <span className="absolute bottom-2.5 right-2.5 flex h-10 w-10 items-center justify-center rounded-full border border-primary bg-white text-2xl leading-none shadow-float group-hover:bg-primary group-hover:text-white">
-            +
-          </span>
-        )}
-      </button>
-      <div className="mt-2 space-y-1 px-0.5">
-        {price !== undefined && <p className="font-bold">about {formatUsd(price)} each</p>}
-        <h3 className="line-clamp-2 text-[15px] leading-snug">{need.title}</h3>
+      </div>
+      <div className="flex flex-1 flex-col p-3">
+        <h3 className="line-clamp-2 min-h-[2.6em] text-[15px] font-semibold leading-snug">{need.title}</h3>
         {partner && (
-          <Link href={`/p/${partner.id}`} className="-my-3 flex min-h-11 items-center gap-1 text-[13px] text-secondary hover:text-primary hover:underline">
+          <Link href={`/p/${partner.id}`} className="-my-1.5 flex min-h-11 items-center gap-1 text-[13px] text-secondary hover:text-primary hover:underline">
             <span className="truncate">{partner.name}</span>
             {getVerification(partner.id).verified && (
               <span className="shrink-0 text-express" title="Verified nonprofit (IRS records)">
@@ -65,17 +58,39 @@ export function NeedCard({ need, partner, category, price, helpers, onFill, clas
                 <span className="sr-only">, verified nonprofit</span>
               </span>
             )}
+            {miles !== undefined && <span className="shrink-0">· {miles.toFixed(1)} mi</span>}
           </Link>
         )}
-        <div className="flex items-center gap-2 pt-0.5" aria-label={`${need.qtyPledged} of ${need.qtyNeeded} pledged`}>
-          <span className="h-1 flex-1 overflow-hidden rounded-full bg-hairline">
+        <div className="mt-1" aria-label={`${need.qtyPledged} of ${need.qtyNeeded} pledged`}>
+          <span className="block h-1.5 overflow-hidden rounded-full bg-hairline">
             <span className="block h-full rounded-full bg-[var(--accent-express-text)]" style={{ width: `${pct}%` }} />
           </span>
-          <span className="shrink-0 text-xs text-secondary">
-            {need.qtyPledged}/{need.qtyNeeded}
+          <span className="mt-1 flex justify-between gap-2 text-xs">
+            <span className="font-semibold">{closed ? "Fully pledged" : `${remaining} left`}</span>
+            <span className="text-secondary tabular-nums">
+              {need.qtyPledged} of {need.qtyNeeded}
+            </span>
           </span>
         </div>
-        {who && <p className="truncate text-xs text-secondary">{who} {closed ? "filled this" : "helping"}</p>}
+        <p className="mt-1 min-h-4 truncate text-xs text-secondary">{who ? `${who} ${closed ? "filled this" : "helping"}` : ""}</p>
+        <div className="mt-auto flex items-center justify-between gap-2 pt-2">
+          <p className="text-sm">
+            {price !== undefined && (
+              <>
+                <span className="font-bold tabular-nums">{formatUsd(price)}</span> <span className="text-secondary">each</span>
+              </>
+            )}
+          </p>
+          <button
+            type="button"
+            onClick={() => onFill(need)}
+            disabled={closed}
+            aria-label={closed ? `${need.title}: filled` : `Fill ${need.title}${partner ? ` for ${partner.name}` : ""}, ${remaining} left`}
+            className="press min-h-11 shrink-0 rounded-full bg-primary px-5 text-sm font-semibold text-white hover:bg-black disabled:bg-surface-muted disabled:text-secondary"
+          >
+            {closed ? "Filled" : "Fill"}
+          </button>
+        </div>
       </div>
     </li>
   );

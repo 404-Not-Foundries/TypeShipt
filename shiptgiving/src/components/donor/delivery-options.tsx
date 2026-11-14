@@ -1,6 +1,5 @@
 import { formatUsd, mileageValue } from "@/lib/fees";
-import type { Fulfillment, Partner, PledgeCost, Store } from "@/lib/types";
-import { CostBreakdown } from "./cost-breakdown";
+import type { Fulfillment, Partner, Store } from "@/lib/types";
 import { formatWindow, hoursAssumed } from "./geo";
 import { StorePicker } from "./store-picker";
 
@@ -12,8 +11,6 @@ type Props = {
   stores: { store: Store; miles: number }[];
   storeId: string | null;
   onStore: (id: string) => void;
-  cost: PledgeCost;
-  donors: number;
   driveMiles: number;
   fromLabel: string;
   onLocate: () => void;
@@ -32,7 +29,7 @@ export function DeliveryOptions(p: Props) {
     <div className="space-y-3">
       <fieldset className="min-w-0">
         <legend className="mb-2 text-sm font-medium">How should it get there?</legend>
-        <div className="grid gap-2 sm:grid-cols-3">
+        <div className="grid gap-2">
           {options.map((o) => (
             <label key={o.value} className="cursor-pointer rounded-xl border border-hairline p-3 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary has-[:checked]:border-primary has-[:checked]:bg-surface-muted">
               <input type="radio" name="fulfillment" value={o.value} checked={p.value === o.value} onChange={() => p.onChange(o.value)} className="sr-only" />
@@ -70,7 +67,6 @@ export function DeliveryOptions(p: Props) {
         </div>
       )}
 
-      <CostBreakdown cost={p.cost} donors={p.donors} fulfillment={p.value} />
     </div>
   );
 }

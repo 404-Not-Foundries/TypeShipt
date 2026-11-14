@@ -112,3 +112,7 @@ Three people and several AI coding agents built this in one day.
 - **Plan, build, review.** Work is planned before coding, built on one branch per task, checked with tests, type check, lint and a production build, reviewed, and merged in small pull requests.
 - **Claude Code and Codex in parallel.** Each agent works in its own git worktree, so several features move at once without touching the same files. Work from one tool is reviewed with the other: the demo scenario and impact page were built by Codex and reviewed by Claude.
 - **People decide.** The team lead assigns work and settles conflicts; agents don't reassign each other.
+
+## Image credits
+
+Item photos on the need cards are freely licensed (CC0, public domain, CC BY or CC BY-SA) and come from Wikimedia Commons, Flickr (via Openverse) and Open Food Facts. They were resolved once into a static snapshot, `src/lib/item-images.ts`, which lists the author and licence of every photo; the same list is on the Give page under "Photo credits". The photos illustrate the kind of item and are not the exact products. Items without a photo fall back to the category line art.
