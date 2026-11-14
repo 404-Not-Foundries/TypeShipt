@@ -104,6 +104,7 @@ export function KeyCode() {
           </p>
           <pre
             tabIndex={0}
+            role="region"
             aria-label={`Code from ${e.path}`}
             className="mt-2 overflow-x-auto rounded-xl bg-dark-band p-4 text-[12px] leading-relaxed text-white"
           >
