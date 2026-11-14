@@ -1,4 +1,4 @@
-// Shipt design tokens for the partner portal (spec: docs/context/shipt-design.md, Part 2).
+// Shipt design tokens for the partner portal.
 const FOCUS = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
 const PILL_BUTTON = `inline-flex min-h-11 items-center justify-center rounded-full px-5 text-sm font-semibold disabled:opacity-50 ${FOCUS}`;
 
