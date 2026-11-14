@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { OrderDetails } from "@/components/shipt/order-details";
 import { OrderTimeline } from "@/components/shipt/order-timeline";
 import { PlatformPayload } from "@/components/shipt/platform-payload";
 import { toShiptOrder } from "@/lib/shipt-platform";
 import { useAppState } from "@/lib/use-app-state";
 
-export function OrderTracking({ pledgeId }: { pledgeId: string }) {
+export function OrderTracking() {
+  const { id: pledgeId } = useParams<{ id: string }>();
   const { state, error } = useAppState();
   const pledge = state?.pledges.find((entry) => entry.id === pledgeId);
   const partner = state?.partners.find((entry) => entry.id === pledge?.partnerId);
