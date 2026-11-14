@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { pledgeCost } from "@/lib/fees";
+import { fleetCapacity } from "@/lib/routing/assign";
 import type { AppState, Fulfillment, Need, Pledge } from "@/lib/types";
 import { DeliveryOptions } from "./delivery-options";
 import { dropOff, roadMiles } from "./geo";
@@ -107,6 +108,11 @@ export function FillSheet({ need, state, onClose, onPledged }: Props) {
         ) : (
           <div className="space-y-4">
             {remaining < 1 && <p role="status" className="rounded-xl bg-express p-3 text-express text-sm">Someone just filled the rest of this need. Thank you!</p>}
+            {qty > fleetCapacity(state.drivers) && fleetCapacity(state.drivers) > 0 && (
+              <p role="status" className="rounded-xl bg-surface-muted p-3 text-sm text-secondary">
+                That&apos;s more than tomorrow&apos;s drivers can carry ({fleetCapacity(state.drivers)} items). Part may wait for a later run.
+              </p>
+            )}
             <QuantityStepper value={qty} max={remaining} onChange={setQty} unitPrice={item?.price} />
             <DeliveryOptions
               partner={partner}

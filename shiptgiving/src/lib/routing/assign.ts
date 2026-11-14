@@ -35,6 +35,17 @@ export function windowFor(partner: Partner, day: number): { open: string; close:
   return undefined;
 }
 
+/** An oversized pledge becomes same-id chunks no bigger than the biggest vehicle, so it can ride in several. */
+export function splitPledge(p: Pledge, maxCap: number): Pledge[] {
+  if (maxCap <= 0 || p.qty <= maxCap) return [p];
+  const chunks: Pledge[] = [];
+  for (let left = p.qty; left > 0; left -= maxCap) chunks.push({ ...p, qty: Math.min(left, maxCap) });
+  return chunks;
+}
+
+/** Items the whole fleet can carry in one trip each. Donor UI uses it for a soft hint. */
+export const fleetCapacity = (drivers: Driver[]) => drivers.reduce((n, d) => n + d.capacity, 0);
+
 /**
  * Sorts drivers biggest first. Each driver takes partner groups in order of earliest closing time, then distance
  * from the driver's start, loading whole pledges while they fit. Pledges that fit no vehicle come back as unrouted.
@@ -43,8 +54,9 @@ export function assignPledges(state: AppState, day: number): { assignments: Assi
   const partnerById = new Map(state.partners.filter(hasSafeDrop).map((p) => [p.id, p]));
   const open = state.pledges.filter(isRoutable);
   // A pledge with no partner to deliver to (gone, or no safe drop point) is never loaded.
-  const taken = new Set(open.filter((p) => !partnerById.has(p.partnerId)).map((p) => p.id));
-  const undeliverable = [...taken];
+  const undeliverable = open.filter((p) => !partnerById.has(p.partnerId));
+  const taken = new Set<Pledge>(undeliverable);
+  const maxCap = Math.max(0, ...state.drivers.map((d) => d.capacity));
 
   const groups = [...new Set(open.map((p) => p.partnerId))]
     .filter((id) => partnerById.has(id))
@@ -54,7 +66,7 @@ export function assignPledges(state: AppState, day: number): { assignments: Assi
       return {
         drop: dropLocation(partner),
         closes: w ? toMinutes(w.close) : Infinity,
-        pledges: open.filter((p) => p.partnerId === id).sort((a, b) => b.qty - a.qty),
+        pledges: open.filter((p) => p.partnerId === id).flatMap((p) => splitPledge(p, maxCap)).sort((a, b) => b.qty - a.qty),
       };
     });
 
@@ -67,8 +79,8 @@ export function assignPledges(state: AppState, day: number): { assignments: Assi
     const pledges: Pledge[] = [];
     for (const group of ordered) {
       for (const p of group.pledges) {
-        if (taken.has(p.id) || load + p.qty > driver.capacity) continue;
-        taken.add(p.id);
+        if (taken.has(p) || load + p.qty > driver.capacity) continue;
+        taken.add(p);
         pledges.push(p);
         load += p.qty;
       }
@@ -78,6 +90,6 @@ export function assignPledges(state: AppState, day: number): { assignments: Assi
 
   return {
     assignments: assignments.filter((a) => a.pledges.length > 0),
-    unrouted: [...undeliverable, ...open.filter((p) => !taken.has(p.id)).map((p) => p.id)],
+    unrouted: [...new Set([...undeliverable, ...groups.flatMap((g) => g.pledges).filter((p) => !taken.has(p))].map((p) => p.id))],
   };
 }

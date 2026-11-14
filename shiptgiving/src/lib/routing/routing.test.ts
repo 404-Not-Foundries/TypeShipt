@@ -60,11 +60,12 @@ describe("fleet routing", () => {
     expect(plan.unrouted).toEqual([]);
   });
 
-  it("reports pledges that fit no vehicle as unrouted", () => {
+  it("reports what the fleet cannot carry as unrouted", () => {
     const big = pledge("north", 11);
-    const plan = planRoutes(state([driver("car", "compact")], [big, pledge("south", 3)]), DAY);
-    expect(plan.unrouted).toEqual([big.id]);
-    expect(plan.routes[0].load).toBe(3);
+    const small = pledge("south", 3);
+    const plan = planRoutes(state([driver("car", "compact")], [big, small]), DAY);
+    expect(plan.unrouted).toEqual([big.id, small.id]);
+    expect(plan.routes[0].load).toBe(10);
   });
 
   it("skips volunteers and pledges already picked up", () => {
@@ -142,5 +143,18 @@ describe("fleet routing", () => {
     const plan = planRoutes(state([driver("bus", "bus")], [unsafe, pledge("open", 1)], [hidden, partner("open", 33.47, -86.82)]), DAY);
     expect(plan.unrouted).toEqual([unsafe.id]);
     expect(JSON.stringify(plan.routes)).not.toContain(JSON.stringify(hidden.location));
+  });
+
+  it("splits an oversized pledge across vehicles and only leaves the excess unrouted", () => {
+    const fleet = [driver("suv1", "suv"), driver("suv2", "suv")];
+    const big = pledge("north", 80);
+    const plan = planRoutes(state(fleet, [big]), DAY);
+    const carried = plan.routes.reduce((n, r) => n + r.load, 0);
+    expect(carried).toBe(80);
+    expect(plan.routes).toHaveLength(2);
+    expect(plan.unrouted).toEqual([]);
+    const over = planRoutes(state(fleet, [pledge("north", 130)]), DAY);
+    expect(over.routes.reduce((n, r) => n + r.load, 0)).toBe(100);
+    expect(over.unrouted).toHaveLength(1);
   });
 });
