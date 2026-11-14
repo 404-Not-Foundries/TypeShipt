@@ -1,7 +1,10 @@
 "use client";
 // Donor needs feed. Owner: mulimangila.
 import { useEffect, useMemo, useState } from "react";
+import { ActivityFeed } from "@/components/donor/activity-feed";
+import { helpersByNeed } from "@/components/donor/community";
 import { FeedSkeleton } from "@/components/donor/feed-skeleton";
+import { FilledCelebration } from "@/components/donor/filled-celebration";
 import { FillSheet } from "@/components/donor/fill-sheet";
 import { FilterChips } from "@/components/donor/filter-chips";
 import { MyPledges } from "@/components/donor/my-pledges";
@@ -26,6 +29,7 @@ export default function GivePage() {
   }, [refresh]);
 
   const categoryOf = useMemo(() => new Map(state?.catalog.map((c) => [c.id, c.category]) ?? []), [state?.catalog]);
+  const helpers = useMemo(() => helpersByNeed(state?.pledges ?? []), [state?.pledges]);
   const visible = useMemo(() => {
     if (!state) return [];
     return sortNeeds(
@@ -48,6 +52,7 @@ export default function GivePage() {
       </header>
       {error && <p role="alert" className="text-sm text-secondary">{error}</p>}
       <WeatherBanner weather={state.weather} />
+      <ActivityFeed state={state} />
       <MyPledges ids={myIds} state={state} />
       <div className="space-y-2">
         <FilterChips label="Partners" value={partnerId} onChange={setPartnerId} options={partnersWithNeeds.map((p) => ({ value: p.id, label: p.name }))} />
@@ -58,10 +63,11 @@ export default function GivePage() {
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {visible.map((n) => (
-            <NeedCard key={n.id} need={n} partner={state.partners.find((p) => p.id === n.partnerId)} category={categoryOf.get(n.itemId)} onFill={(need) => setFillingId(need.id)} />
+            <NeedCard key={n.id} need={n} partner={state.partners.find((p) => p.id === n.partnerId)} category={categoryOf.get(n.itemId)} helpers={helpers.get(n.id)} onFill={(need) => setFillingId(need.id)} />
           ))}
         </ul>
       )}
+      <FilledCelebration state={state} />
       {filling && (
         <FillSheet
           need={filling}

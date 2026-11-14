@@ -5,7 +5,10 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import { FeedSkeleton } from "@/components/donor/feed-skeleton";
 import { FillSheet } from "@/components/donor/fill-sheet";
+import { helpersByNeed } from "@/components/donor/community";
+import { FilledCelebration } from "@/components/donor/filled-celebration";
 import { NeedCard } from "@/components/donor/need-card";
+import { NeighborWall } from "@/components/donor/neighbor-wall";
 import { PartnerFacts } from "@/components/donor/partner-facts";
 import { useMyPledgeIds } from "@/components/donor/pledge-history";
 import { sortNeeds } from "@/components/donor/sort-needs";
@@ -31,12 +34,14 @@ export function PartnerView() {
   const needs = state.needs.filter((n) => n.partnerId === partner.id);
   const open = sortNeeds(needs.filter((n) => n.qtyPledged < n.qtyNeeded));
   const categoryOf = new Map(state.catalog.map((c) => [c.id, c.category]));
+  const helpers = helpersByNeed(state.pledges);
   const filling = state.needs.find((n) => n.id === fillingId);
 
   return (
     <article className="space-y-6 text-primary">
       <Link href="/" className="text-sm text-primary hover:underline">← All needs</Link>
       <PartnerFacts partner={partner} needs={needs} />
+      <NeighborWall state={state} partner={partner} />
       <section aria-labelledby="open-needs" className="space-y-3">
         <h2 id="open-needs" className="text-lg font-semibold">Open needs ({open.length})</h2>
         {open.length === 0 ? (
@@ -44,11 +49,12 @@ export function PartnerView() {
         ) : (
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {open.map((n) => (
-              <NeedCard key={n.id} need={n} category={categoryOf.get(n.itemId)} onFill={(need) => setFillingId(need.id)} />
+              <NeedCard key={n.id} need={n} category={categoryOf.get(n.itemId)} helpers={helpers.get(n.id)} onFill={(need) => setFillingId(need.id)} />
             ))}
           </ul>
         )}
       </section>
+      <FilledCelebration state={state} />
       {filling && (
         <FillSheet
           need={filling}
