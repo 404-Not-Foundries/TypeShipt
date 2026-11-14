@@ -10,7 +10,7 @@ export function CommunityOrders({ state }: { state: AppState }) {
       {pledges.length === 0 ? (
         <div className="mt-4">
           <p className="text-sm text-secondary">No community orders yet. Fill a need to follow its journey here.</p>
-          <Link href="/" className="mt-3 inline-flex min-h-11 items-center rounded-full border border-primary bg-white px-5 text-sm font-semibold">Browse needs</Link>
+          <Link href="/give" className="mt-3 inline-flex min-h-11 items-center rounded-full border border-primary bg-white px-5 text-sm font-semibold">Browse needs</Link>
         </div>
       ) : (
         <ul className="mt-4 divide-y divide-hairline">

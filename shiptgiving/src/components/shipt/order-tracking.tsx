@@ -27,7 +27,7 @@ export function OrderTracking({ pledgeId }: { pledgeId: string }) {
         <div className="rounded-2xl border border-hairline bg-totemeal p-6">
           <h2 className="text-xl font-bold">We couldn&apos;t find that pledge</h2>
           <p className="mt-2 max-w-lg text-sm text-secondary">It may have been cleared by a demo reset. Browse current needs or return to your community orders.</p>
-          <Link href="/" className="mt-4 inline-flex min-h-11 items-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white">Browse needs</Link>
+          <Link href="/give" className="mt-4 inline-flex min-h-11 items-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white">Browse needs</Link>
         </div>
       ) : (
         <>

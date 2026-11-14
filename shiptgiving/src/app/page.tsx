@@ -1,84 +1,98 @@
 "use client";
-// Donor needs feed. Owner: mulimangila.
-import { useEffect, useMemo, useState } from "react";
-import { ActivityFeed } from "@/components/donor/activity-feed";
-import { helpersByNeed } from "@/components/donor/community";
-import { FeedSkeleton } from "@/components/donor/feed-skeleton";
-import { FilledCelebration } from "@/components/donor/filled-celebration";
-import { FillSheet } from "@/components/donor/fill-sheet";
-import { FilterChips } from "@/components/donor/filter-chips";
-import { MyPledges } from "@/components/donor/my-pledges";
-import { NeedCard } from "@/components/donor/need-card";
-import { useMyPledgeIds } from "@/components/donor/pledge-history";
-import { sortNeeds } from "@/components/donor/sort-needs";
-import { WeatherBanner } from "@/components/donor/weather-banner";
+// Owner: rmaytr. Home hub: what ShiptGiving is, how tonight looks, and a door for each role.
+import Link from "next/link";
+import { useEffect } from "react";
 import { useAppState } from "@/lib/use-app-state";
 
-export default function GivePage() {
-  const { state, error, refresh } = useAppState();
-  const [partnerId, setPartnerId] = useState<string | null>(null);
-  const [category, setCategory] = useState<string | null>(null);
-  const [fillingId, setFillingId] = useState<string | null>(null);
-  const [myIds, addMyId] = useMyPledgeIds();
+const ROLES = [
+  { href: "/give", title: "Give", who: "For neighbors", text: "See what Birmingham needs tonight and fill it in a few taps.", cta: "Fill a need" },
+  { href: "/partner", title: "Nonprofits", who: "For partners", text: "Post what you need in plain words and confirm what arrives.", cta: "Open the portal" },
+  { href: "/driver", title: "Drivers", who: "For Shipt and volunteer drivers", text: "Tomorrow's fleet, a route sized to each vehicle, and the map.", cta: "See the routes" },
+];
 
-  // Check the NWS forecast once on load so the Weather Surge shows even before the partner portal is opened.
+const MORE = [
+  { href: "/impact", title: "Impact", text: "What the city has given so far." },
+  { href: "/shipt", title: "See it inside the Shipt app", text: "A concept of ShiptGiving as a Shipt section." },
+  { href: "/demo", title: "Presenter view", text: "Donor, nonprofit and driver side by side." },
+];
+
+// The whole card is the link target; the heading stays the accessible name.
+const STRETCH = "after:absolute after:inset-0 after:rounded-2xl";
+
+export default function HomePage() {
+  const { state, error, refresh } = useAppState();
+
+  // Ask for the forecast once so an active Weather Surge shows here before any other page is opened.
   useEffect(() => {
     fetch("/api/weather", { cache: "no-store" })
       .then(() => refresh())
       .catch(() => {});
   }, [refresh]);
 
-  const categoryOf = useMemo(() => new Map(state?.catalog.map((c) => [c.id, c.category]) ?? []), [state?.catalog]);
-  const helpers = useMemo(() => helpersByNeed(state?.pledges ?? []), [state?.pledges]);
-  const visible = useMemo(() => {
-    if (!state) return [];
-    return sortNeeds(
-      state.needs.filter((n) => (!partnerId || n.partnerId === partnerId) && (!category || categoryOf.get(n.itemId) === category)),
-    );
-  }, [state, partnerId, category, categoryOf]);
-
-  if (!state) return error ? <p role="alert" className="text-sale">{error}</p> : <FeedSkeleton />;
-
-  const partnersWithNeeds = state.partners.filter((p) => state.needs.some((n) => n.partnerId === p.id));
-  const categories = [...new Set(state.needs.map((n) => categoryOf.get(n.itemId)).filter((c): c is string => !!c))].sort();
-  const filling = state.needs.find((n) => n.id === fillingId);
+  const stats = state && [
+    { label: "urgent needs", value: state.needs.filter((n) => n.urgency === "urgent" && n.qtyPledged < n.qtyNeeded).length },
+    { label: "items pledged", value: state.needs.reduce((sum, n) => sum + n.qtyPledged, 0) },
+    { label: "nonprofit partners", value: state.partners.length },
+  ];
 
   return (
-    <section className="space-y-5 text-primary">
-      <header>
-        <p className="text-xs font-semibold uppercase tracking-[0.08em] text-secondary">ShiptGiving · Birmingham</p>
-        <h1 className="mt-1 text-[32px] font-extrabold leading-[1.15] sm:text-[44px]">What Birmingham needs today</h1>
-        <p className="mt-1 text-secondary">Fill a real need in a few taps: Shipt delivers, you drive it, or we pick it up from your porch.</p>
-      </header>
-      {error && <p role="alert" className="text-sm text-secondary">{error}</p>}
-      <WeatherBanner weather={state.weather} />
-      <ActivityFeed state={state} />
-      <MyPledges ids={myIds} state={state} />
-      <div className="space-y-2">
-        <FilterChips label="Partners" value={partnerId} onChange={setPartnerId} options={partnersWithNeeds.map((p) => ({ value: p.id, label: p.name }))} />
-        <FilterChips label="Categories" value={category} onChange={setCategory} options={categories.map((c) => ({ value: c, label: c }))} />
-      </div>
-      {visible.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-hairline p-8 text-center text-secondary">No needs match these filters right now.</p>
-      ) : (
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {visible.map((n) => (
-            <NeedCard key={n.id} need={n} partner={state.partners.find((p) => p.id === n.partnerId)} category={categoryOf.get(n.itemId)} helpers={helpers.get(n.id)} onFill={(need) => setFillingId(need.id)} />
-          ))}
-        </ul>
-      )}
-      <FilledCelebration state={state} />
-      {filling && (
-        <FillSheet
-          need={filling}
-          state={state}
-          onClose={() => setFillingId(null)}
-          onPledged={(p) => {
-            addMyId(p.id);
-            refresh();
-          }}
-        />
-      )}
-    </section>
+    <div className="space-y-6 text-primary">
+      <section className="rounded-2xl bg-hero-sage p-6 sm:p-10">
+        <h1 className="text-[40px] font-extrabold leading-[1.1] tracking-tight sm:text-[56px]">ShiptGiving</h1>
+        <p className="mt-3 max-w-2xl text-lg">
+          Birmingham nonprofits post what they need tonight. Neighbors fill it through Shipt, by driving, or by porch
+          pickup.
+        </p>
+        {error && (
+          <p role="alert" className="mt-4 text-sm font-semibold">
+            {error}
+          </p>
+        )}
+        {stats && (
+          <dl aria-label="Right now in Birmingham" className="mt-6 flex flex-wrap gap-x-10 gap-y-4">
+            {stats.map((s) => (
+              <div key={s.label} className="flex flex-col-reverse">
+                <dt className="text-sm">{s.label}</dt>
+                <dd className="text-4xl font-extrabold tabular-nums">{s.value.toLocaleString()}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+        {state?.weather.surge && state.weather.reason && (
+          <p className="mt-5 inline-flex min-h-8 items-center rounded-full bg-dark-band px-4 text-sm font-semibold text-white">
+            Weather Surge: {state.weather.reason}
+          </p>
+        )}
+      </section>
+
+      <ul className="grid gap-4 md:grid-cols-3">
+        {ROLES.map((r) => (
+          <li key={r.href} className="relative flex flex-col rounded-2xl border border-hairline bg-white p-6 hover:border-primary">
+            <p className="text-sm text-secondary">{r.who}</p>
+            <h2 className="mt-1 text-[28px] font-bold leading-tight">{r.title}</h2>
+            <p className="mt-2 mb-6 text-secondary">{r.text}</p>
+            <Link
+              href={r.href}
+              className={`mt-auto inline-flex min-h-11 items-center self-start rounded-full bg-primary px-6 text-sm font-semibold text-white ${STRETCH}`}
+            >
+              {r.cta}
+            </Link>
+          </li>
+        ))}
+      </ul>
+
+      <ul className="grid gap-3 sm:grid-cols-3">
+        {MORE.map((m) => (
+          <li key={m.href} className="relative rounded-2xl bg-totemeal p-4 hover:bg-surface-muted">
+            <h2 className="font-bold">
+              <Link href={m.href} className={`underline ${STRETCH}`}>
+                {m.title}
+              </Link>
+            </h2>
+            <p className="mt-1 text-sm text-secondary">{m.text}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

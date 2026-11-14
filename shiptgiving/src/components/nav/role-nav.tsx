@@ -4,32 +4,36 @@ import { usePathname } from "next/navigation";
 import { Suspense, useSyncExternalStore } from "react";
 
 const LINKS = [
-  { href: "/", label: "Give" },
-  { href: "/partner", label: "Partner" },
-  { href: "/driver", label: "Driver" },
+  { href: "/give", label: "Give" },
+  { href: "/partner", label: "Nonprofits" },
+  { href: "/driver", label: "Drivers" },
   { href: "/impact", label: "Impact" },
-  { href: "/shipt", label: "Shipt" },
-  { href: "/demo", label: "Demo" },
 ];
 
 function NavLinks({ path }: { path: string | null }) {
+  const on = (href: string) => path?.startsWith(href) || (href === "/give" && path?.startsWith("/p/"));
   return (
-    <ul className="flex flex-wrap gap-1 text-sm font-semibold">
-      {LINKS.map((l) => {
-        const active =
-          path !== null && (l.href === "/" ? path === "/" || path.startsWith("/p/") : path.startsWith(l.href));
-        return (
-          <li key={l.href}>
-            <Link
-              href={l.href}
-              aria-current={active ? "page" : undefined}
-              className={`inline-flex min-h-11 items-center rounded-full px-4 ${active ? "bg-primary text-white" : "text-primary hover:bg-surface-muted"}`}
-            >
-              {l.label}
-            </Link>
-          </li>
-        );
-      })}
+    <ul className="flex flex-wrap items-center gap-1 text-sm font-semibold">
+      {LINKS.map((l) => (
+        <li key={l.href}>
+          <Link
+            href={l.href}
+            aria-current={on(l.href) ? "page" : undefined}
+            className={`inline-flex min-h-11 items-center rounded-full px-4 ${on(l.href) ? "bg-primary text-white" : "text-primary hover:bg-surface-muted"}`}
+          >
+            {l.label}
+          </Link>
+        </li>
+      ))}
+      <li>
+        <Link
+          href="/demo"
+          aria-current={on("/demo") ? "page" : undefined}
+          className="inline-flex min-h-11 items-center px-3 text-xs font-normal text-secondary underline hover:text-primary"
+        >
+          Presenter
+        </Link>
+      </li>
     </ul>
   );
 }
