@@ -14,7 +14,8 @@ export function FillSheet({ need, state, onClose, onPledged }: Props) {
   const partner = state.partners.find((p) => p.id === need.partnerId);
   const item = state.catalog.find((c) => c.id === need.itemId);
   const remaining = Math.max(0, need.qtyNeeded - need.qtyPledged);
-  const [qty, setQty] = useState(Math.min(1, remaining));
+  const [qtyWanted, setQty] = useState(1);
+  const qty = Math.max(0, Math.min(qtyWanted, remaining)); // re-clamped as other donors pledge
   const [fulfillment, setFulfillment] = useState<Fulfillment>("shipt");
   const [storeId, setStoreId] = useState<string | null>(null);
   const [donorName, setDonorName] = useState("");
@@ -23,13 +24,19 @@ export function FillSheet({ need, state, onClose, onPledged }: Props) {
   const [done, setDone] = useState<Pledge | null>(null);
   const donor = useDonorLocation();
   const dialogRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef(onClose);
 
   useEffect(() => {
+    closeRef.current = onClose;
+  });
+
+  // Focus once on open; polling re-renders must not steal focus from the inputs.
+  useEffect(() => {
     dialogRef.current?.focus();
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && closeRef.current();
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  }, []);
 
   const drop = partner ? dropOff(partner) : null;
   const stores = useMemo(() => {
@@ -99,6 +106,7 @@ export function FillSheet({ need, state, onClose, onPledged }: Props) {
           <PledgeSuccess pledge={done} partner={partner} title={need.title} onClose={onClose} />
         ) : (
           <div className="space-y-4">
+            {remaining < 1 && <p role="status" className="rounded-xl bg-emerald-50 p-3 text-sm">Someone just filled the rest of this need. Thank you!</p>}
             <QuantityStepper value={qty} max={remaining} onChange={setQty} unitPrice={item?.price} />
             <DeliveryOptions
               partner={partner}
