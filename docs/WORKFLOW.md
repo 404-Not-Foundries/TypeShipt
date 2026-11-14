@@ -55,7 +55,7 @@ Based on the "Hackathon Agent Board" setup from Knight Hacks and Cal Hacks (http
 Other useful ECC agents (ask by name): `architect` (system design), `e2e-runner` (Playwright flows for the demo path), `doc-updater` (README).
 
 ## Codex
-Codex reads `AGENTS.md` and has the ECC plugin installed. Good uses:
+Codex reads `AGENTS.md` and has the ECC plugin installed. To start a session, paste the prompt in [`docs/CODEX_START.md`](CODEX_START.md). Good uses:
 - A **second opinion**: run `/review` in Codex on a branch Claude wrote, before merging.
 - **Parallel grunt work** in its own worktree: seed data, fixtures, a README section, a pitch-deck outline.
 Give Codex and Claude different worktrees or branches. Never point both at the same files at the same time.

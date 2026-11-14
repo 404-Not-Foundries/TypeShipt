@@ -7,4 +7,5 @@ Team **404 Not Foundries** (UAB) at **SHIPT Hacks**.
 ## Getting started
 1. Set up your AI tools: [`docs/SETUP.md`](docs/SETUP.md) (Claude Code + Codex + ECC)
 2. How the team works: [`docs/WORKFLOW.md`](docs/WORKFLOW.md)
-3. Agent instructions: [`AGENTS.md`](AGENTS.md) (Codex) / [`CLAUDE.md`](CLAUDE.md) (Claude Code)
+3. Starting a Codex session (copy-paste prompt): [`docs/CODEX_START.md`](docs/CODEX_START.md)
+4. Agent instructions: [`AGENTS.md`](AGENTS.md) (Codex) / [`CLAUDE.md`](CLAUDE.md) (Claude Code)
