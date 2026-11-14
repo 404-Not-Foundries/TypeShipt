@@ -1,6 +1,6 @@
 // Owner: Viral-W. "Verified nonprofit" pill. Safe to mount anywhere a partner is shown (donor feed, partner page).
 import { formatEin, getVerification } from "./verification";
-import { PILL_EXPRESS } from "./styles";
+import { PILL_EXPRESS, PILL_MUTED } from "./styles";
 
 export function CheckIcon() {
   return (
@@ -10,9 +10,19 @@ export function CheckIcon() {
   );
 }
 
-/** Renders nothing unless the partner passed every automated check. */
+export const RELIGIOUS_EXPLAINER =
+  "Churches and their ministries are tax-exempt without registering with the IRS and don't file Form 990, so they often aren't in IRS lists.";
+
+/** Verified pill, or a neutral pill for church ministries. Renders nothing for unverified partners. */
 export function VerifiedBadge({ partnerId, className = "" }: { partnerId: string; className?: string }) {
   const v = getVerification(partnerId);
+  if (v.status === "religious") {
+    return (
+      <span className={`${PILL_MUTED} ${className}`} title={RELIGIOUS_EXPLAINER}>
+        Religious organization
+      </span>
+    );
+  }
   if (!v.verified || !v.ein) return null;
   return (
     <span

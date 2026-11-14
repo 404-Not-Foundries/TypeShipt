@@ -1,7 +1,8 @@
 // Owner: Viral-W. Nonprofit verification records for the seed partners.
 // Each irs block is a snapshot of the IRS Exempt Organizations Business Master File, read through the
 // ProPublica Nonprofit Explorer API (https://projects.propublica.org/nonprofits/api/v2/organizations/<ein>.json)
-// on 2026-11-14. Partners with no IRS record we could confirm have irs: null and stay unverified; nothing is invented.
+// on 2026-11-14, then cross-checked against the IRS EO BMF extract for Alabama (irs.gov/pub/irs-soi/eo_al.csv).
+// Partners with no IRS record we could confirm have irs: null; nothing is invented.
 // Verification is automated (see components/partner/verification.ts): no human approval step.
 
 export type IrsRecord = {
@@ -26,6 +27,11 @@ export type VerificationRecord = {
     street?: string;
   };
   irs: IrsRecord | null;
+  /**
+   * The partner says it is a church or church ministry. Those are tax-exempt without applying to the IRS
+   * (IRC 508(c)(1)(A)) and don't file Form 990, so they are often missing from IRS lists. Only used when irs is null.
+   */
+  religious?: boolean;
   checkedAt: string; // ISO time of the last automated check
 };
 
@@ -33,7 +39,9 @@ const CHECKED_AT = "2026-11-14T19:15:00Z";
 const bham = (name: string, street?: string) => ({ name, city: "Birmingham", state: "AL", ...(street ? { street } : {}) });
 
 export const verificationRecords: VerificationRecord[] = [
-  { partnerId: "firehouse", declared: bham("Firehouse Ministries"), irs: null, checkedAt: CHECKED_AT },
+  // Not in ProPublica or the IRS EO BMF for Alabama (checked by name and street, 2026-11-14). Christian ministry.
+  { partnerId: "firehouse", declared: bham("Firehouse Ministries"), irs: null, religious: true, checkedAt: CHECKED_AT },
+  // Not in ProPublica or the IRS EO BMF for Alabama (checked by name and street, 2026-11-14). Not a ministry.
   {
     partnerId: "jvtf",
     // The IRS still lists the farm under its former name, at the same street address.
@@ -50,7 +58,7 @@ export const verificationRecords: VerificationRecord[] = [
   },
   {
     partnerId: "foodbank",
-    // Real mismatch: the IRS address is in Bessemer, so the city check fails.
+    // The IRS address is in Bessemer, which is in the Birmingham metro, so the city check passes as a metro match.
     declared: bham("Community Food Bank of Central Alabama"),
     irs: { ein: "630837956", legalName: "Community Food Bank Of Central Alabama", city: "Bessemer", state: "AL", subsection: 3, rulingYear: 1983 },
     checkedAt: CHECKED_AT,
