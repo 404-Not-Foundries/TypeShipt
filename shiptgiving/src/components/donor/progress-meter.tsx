@@ -11,13 +11,13 @@ export function ProgressMeter({ pledged, needed, received = 0 }: Props) {
         aria-valuemax={needed}
         aria-valuenow={pledged}
         aria-label={`${pledged} of ${needed} pledged`}
-        className="relative h-2.5 overflow-hidden rounded-full bg-neutral-200"
+        className="relative h-2.5 overflow-hidden rounded-full bg-hairline"
       >
-        <div className="absolute inset-y-0 left-0 bg-emerald-300 transition-all" style={{ width: `${pct}%` }} />
-        <div className="absolute inset-y-0 left-0 bg-emerald-700 transition-all" style={{ width: `${recvPct}%` }} />
+        <div className="absolute inset-y-0 left-0 bg-express transition-all" style={{ width: `${pct}%` }} />
+        <div className="absolute inset-y-0 left-0 bg-[var(--accent-express-text)] transition-all" style={{ width: `${recvPct}%` }} />
       </div>
-      <p className="mt-1 text-sm text-neutral-600">
-        <strong className="text-neutral-900">{pledged}</strong> of {needed} pledged
+      <p className="mt-1 text-sm text-secondary">
+        <strong className="text-primary">{pledged}</strong> of {needed} pledged
         {received > 0 && <> · {received} received</>}
       </p>
     </div>

@@ -23,13 +23,13 @@ export function PartnerFacts({ partner, needs }: { partner: Partner; needs: Need
   return (
     <header className="space-y-4">
       <div>
-        <h1 className="text-2xl font-bold sm:text-3xl">{partner.name}</h1>
-        <p className="text-sm text-neutral-500">{partner.neighborhood}</p>
-        <p className="mt-2 text-neutral-700">{partner.mission}</p>
+        <h1 className="text-[32px] font-extrabold leading-[1.15] sm:text-[40px]">{partner.name}</h1>
+        <p className="text-sm text-secondary">{partner.neighborhood}</p>
+        <p className="mt-2 text-primary">{partner.mission}</p>
         {partner.features.length > 0 && (
           <ul className="mt-2 flex flex-wrap gap-1.5">
             {partner.features.map((f) => (
-              <li key={f} className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs text-emerald-800">{FEATURE[f]}</li>
+              <li key={f} className="rounded-full bg-express px-2.5 py-0.5 text-xs font-semibold text-express">{FEATURE[f]}</li>
             ))}
           </ul>
         )}
@@ -44,15 +44,15 @@ export function PartnerFacts({ partner, needs }: { partner: Partner; needs: Need
       <div className="grid gap-3 sm:grid-cols-3">
         <Box title={drop.confidential ? "Drop point" : "Address"}>
           <p>{drop.address}</p>
-          {drop.confidential && <p className="mt-1 text-xs text-neutral-500">The shelter&apos;s address stays private. Deliveries go to this public drop point.</p>}
+          {drop.confidential && <p className="mt-1 text-xs text-secondary">The shelter&apos;s address stays private. Deliveries go to this public drop point.</p>}
         </Box>
         <Box title="Receiving hours">
           <ul>{partner.receiving.map((w, i) => <li key={i}>{formatWindow(w)}</li>)}</ul>
-          {hoursAssumed(partner) && <p className="mt-1 text-xs text-amber-700">Hours not published — call to confirm.</p>}
+          {hoursAssumed(partner) && <p className="mt-1 text-xs text-secondary">Hours not published — call to confirm.</p>}
         </Box>
         <Box title="What they accept">
           <ul className="list-disc pl-4">{rules.map((r) => <li key={r}>{r}</li>)}</ul>
-          {a.refuses.length > 0 && <p className="mt-1 text-xs text-red-700">Can&apos;t take: {a.refuses.join(", ")}</p>}
+          {a.refuses.length > 0 && <p className="mt-1 text-xs text-sale">Can&apos;t take: {a.refuses.join(", ")}</p>}
         </Box>
       </div>
     </header>
@@ -61,16 +61,16 @@ export function PartnerFacts({ partner, needs }: { partner: Partner; needs: Need
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="flex flex-col-reverse rounded-2xl bg-white p-3 shadow-sm">
-      <dt className="text-xs text-neutral-500">{label}</dt>
-      <dd className="text-2xl font-bold text-emerald-700">{value}</dd>
+    <div className="flex flex-col-reverse rounded-2xl bg-white p-3">
+      <dt className="text-xs text-secondary">{label}</dt>
+      <dd className="text-2xl font-bold text-primary">{value}</dd>
     </div>
   );
 }
 
 function Box({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-black/10 bg-white p-4 text-sm">
+    <section className="rounded-2xl border border-hairline bg-white p-4 text-sm">
       <h2 className="mb-1 font-semibold">{title}</h2>
       {children}
     </section>

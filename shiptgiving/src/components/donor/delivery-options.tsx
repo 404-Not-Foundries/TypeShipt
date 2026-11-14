@@ -34,10 +34,13 @@ export function DeliveryOptions(p: Props) {
         <legend className="mb-2 text-sm font-medium">How should it get there?</legend>
         <div className="grid gap-2 sm:grid-cols-3">
           {options.map((o) => (
-            <label key={o.value} className="cursor-pointer rounded-xl border border-black/10 p-3 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-emerald-600 has-[:checked]:border-emerald-700 has-[:checked]:bg-emerald-50">
+            <label key={o.value} className="cursor-pointer rounded-xl border border-hairline p-3 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary has-[:checked]:border-primary has-[:checked]:bg-surface-muted">
               <input type="radio" name="fulfillment" value={o.value} checked={p.value === o.value} onChange={() => p.onChange(o.value)} className="sr-only" />
-              <span className="block font-medium">{o.title}</span>
-              <span className="block text-xs text-neutral-600">{o.blurb}</span>
+              <span className="flex items-center gap-2 font-semibold">
+                {o.title}
+                {o.value === "shipt" && <span className="rounded-full bg-express px-2 py-0.5 text-[11px] font-semibold text-express">⚡ Same-day</span>}
+              </span>
+              <span className="block text-xs text-secondary">{o.blurb}</span>
             </label>
           ))}
         </div>
@@ -46,21 +49,21 @@ export function DeliveryOptions(p: Props) {
       {p.value === "shipt" && <StorePicker stores={p.stores} value={p.storeId} onChange={p.onStore} />}
 
       {p.value !== "shipt" && (
-        <div className="rounded-xl bg-neutral-50 p-3 text-sm">
+        <div className="rounded-xl bg-surface-muted p-3 text-sm">
           <p className="font-medium">Receiving hours</p>
           <ul>
             {p.partner.receiving.map((w, i) => <li key={i}>{formatWindow(w)}</li>)}
           </ul>
-          {hoursAssumed(p.partner) && <p className="text-xs text-amber-700">Hours not published — call to confirm.</p>}
+          {hoursAssumed(p.partner) && <p className="text-xs text-secondary">Hours not published — call to confirm.</p>}
           <p className="mt-2">
             {p.value === "porch" ? <>Pickup from <strong>{p.fromLabel}</strong>, about </> : <>About </>}
             <strong>{p.driveMiles.toFixed(1)} mi</strong>{p.value === "porch" ? " to the drop-off." : ` from ${p.fromLabel}.`}{" "}
-            <button type="button" onClick={p.onLocate} className="text-emerald-700 underline" disabled={p.locating}>
+            <button type="button" onClick={p.onLocate} className="text-primary underline" disabled={p.locating}>
               {p.locating ? "Locating…" : "Use my location"}
             </button>
           </p>
           {p.value === "volunteer" && (
-            <p className="text-xs text-neutral-600">
+            <p className="text-xs text-secondary">
               Mileage log: round trip ≈ {formatUsd(mileageValue(p.driveMiles))} at the 14¢/mile charitable rate (itemizers only).
             </p>
           )}

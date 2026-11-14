@@ -19,9 +19,9 @@ export function MyPledges({ ids, state }: { ids: string[]; state: AppState }) {
   const receipt = mine.find((p) => p.id === receiptId);
 
   return (
-    <section aria-labelledby="my-pledges" className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+    <section aria-labelledby="my-pledges" className="rounded-2xl border border-hairline bg-totemeal p-4">
       <h2 id="my-pledges" className="font-semibold">Your pledges</h2>
-      <ul className="mt-2 divide-y divide-emerald-200 text-sm">
+      <ul className="mt-2 divide-y divide-hairline text-sm">
         {mine.map((p) => {
           const need = state.needs.find((n) => n.id === p.needId);
           const partner = state.partners.find((x) => x.id === p.partnerId);
@@ -29,12 +29,12 @@ export function MyPledges({ ids, state }: { ids: string[]; state: AppState }) {
             <li key={p.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
               <span className="min-w-0">
                 {p.qty} × {need?.title ?? "item"} · {partner?.name}
-                <span className="block text-xs text-neutral-600">{formatUsd(amountCharged(p.cost, p.fulfillment))}</span>
+                <span className="block text-xs text-secondary">{formatUsd(amountCharged(p.cost, p.fulfillment))}</span>
               </span>
               <span className="flex items-center gap-2">
-                <span className="rounded-full bg-white px-2 py-0.5 text-xs font-medium">{STATUS[p.status]}</span>
+                <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${p.status === "received" ? "bg-express text-express" : "border border-hairline bg-white"}`}>{STATUS[p.status]}</span>
                 {p.status === "received" && (
-                  <button type="button" onClick={() => setReceiptId(p.id)} className="text-xs font-medium text-emerald-800 underline">
+                  <button type="button" onClick={() => setReceiptId(p.id)} className="text-xs font-medium text-primary underline">
                     View receipt
                   </button>
                 )}
