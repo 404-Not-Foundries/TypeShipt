@@ -34,7 +34,7 @@ export function DeliveryOptions(p: Props) {
         <legend className="mb-2 text-sm font-medium">How should it get there?</legend>
         <div className="grid gap-2 sm:grid-cols-3">
           {options.map((o) => (
-            <label key={o.value} className="cursor-pointer rounded-xl border border-black/10 p-3 has-[:checked]:border-emerald-700 has-[:checked]:bg-emerald-50">
+            <label key={o.value} className="cursor-pointer rounded-xl border border-black/10 p-3 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-emerald-600 has-[:checked]:border-emerald-700 has-[:checked]:bg-emerald-50">
               <input type="radio" name="fulfillment" value={o.value} checked={p.value === o.value} onChange={() => p.onChange(o.value)} className="sr-only" />
               <span className="block font-medium">{o.title}</span>
               <span className="block text-xs text-neutral-600">{o.blurb}</span>
@@ -53,7 +53,8 @@ export function DeliveryOptions(p: Props) {
           </ul>
           {hoursAssumed(p.partner) && <p className="text-xs text-amber-700">Hours not published — call to confirm.</p>}
           <p className="mt-2">
-            About <strong>{p.driveMiles.toFixed(1)} mi</strong> from {p.fromLabel}.{" "}
+            {p.value === "porch" ? <>Pickup from <strong>{p.fromLabel}</strong>, about </> : <>About </>}
+            <strong>{p.driveMiles.toFixed(1)} mi</strong>{p.value === "porch" ? " to the drop-off." : ` from ${p.fromLabel}.`}{" "}
             <button type="button" onClick={p.onLocate} className="text-emerald-700 underline" disabled={p.locating}>
               {p.locating ? "Locating…" : "Use my location"}
             </button>
