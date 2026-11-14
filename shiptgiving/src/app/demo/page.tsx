@@ -165,7 +165,7 @@ export default function DemoPage() {
                   Open in a tab
                 </a>
               </div>
-              <iframe src={src} title={`${LABEL[src]} view`} className="block h-[calc(100dvh-22.5rem)] min-h-[28rem] w-full" />
+              <iframe src={src} title={`${LABEL[src]} view`} className="block h-[calc(100dvh-22.75rem)] min-h-[28rem] w-full" />
             </section>
           );
         })}

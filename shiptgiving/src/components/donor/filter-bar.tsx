@@ -46,7 +46,7 @@ function PillSelect({ label, active, children, ...rest }: { label: string; activ
 export function FilterBar(p: Props) {
   const active = p.query.trim() !== "" || p.partnerId !== null || p.selected.length > 0;
   return (
-    <div className="sticky top-0 z-20 -mx-4 space-y-2 border-b border-hairline bg-white px-4 py-3 sm:top-[61px]">
+    <div className="sticky top-0 z-20 -mx-4 space-y-2 border-b border-hairline bg-white px-4 py-3 md:top-[62px]">
       <label className="relative block">
         <span className="sr-only">Search needs</span>
         <input
