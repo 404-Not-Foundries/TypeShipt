@@ -11,6 +11,8 @@ import { PartnerPicker } from "@/components/partner/partner-picker";
 import { PostNeed } from "@/components/partner/post-need";
 import { RulesSummary } from "@/components/partner/rules-summary";
 import { SurgePanel } from "@/components/partner/surge-panel";
+import { VerificationCard } from "@/components/partner/verification-card";
+import { VerifiedBadge } from "@/components/partner/verified-badge";
 
 export default function PartnerPage() {
   const { state, error, refresh } = useAppState();
@@ -38,6 +40,7 @@ export default function PartnerPage() {
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-3xl font-extrabold leading-tight text-primary">{partner.name}</h1>
+            <VerifiedBadge partnerId={partner.id} />
             <ConfidentialBadge partner={partner} />
           </div>
           <p className="mt-2 max-w-2xl text-sm text-secondary">{partner.mission}</p>
@@ -61,6 +64,7 @@ export default function PartnerPage() {
           <ConfidentialNotice partner={partner} />
           <SurgePanel partner={partner} weather={state.weather} needs={needs} onChanged={refresh} />
           <RulesSummary partner={partner} />
+          <VerificationCard key={partner.id} partner={partner} />
         </div>
       </div>
 
