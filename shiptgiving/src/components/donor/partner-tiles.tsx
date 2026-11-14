@@ -6,7 +6,7 @@ const initials = (name: string) =>
   name.replace(/^The /, "").split(/\s+/).filter((w) => /^[A-Z]/.test(w)).slice(0, 2).map((w) => w[0]).join("") ||
   name.charAt(0).toUpperCase();
 
-/** "Shelters near you": Shipt store-tile pattern, one tile per partner with open needs. */
+/** Nonprofits with open needs, most urgent first. Each row opens the partner page. */
 export function PartnerTiles({ partners, needs }: { partners: Partner[]; needs: Need[] }) {
   const rows = partners
     .map((p) => {
@@ -16,19 +16,23 @@ export function PartnerTiles({ partners, needs }: { partners: Partner[]; needs: 
     .filter((r) => r.open > 0)
     .sort((a, b) => Number(b.urgent) - Number(a.urgent) || b.open - a.open);
 
+  // One compact row per nonprofit: a single scrolling line on phones, a grid from 640px up.
   return (
-    <ul aria-label="Shelters and nonprofits" className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none]">
+    <ul aria-label="Shelters and nonprofits" className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3">
       {rows.map(({ p, open, urgent }) => (
-        <li key={p.id} className="w-36 shrink-0">
-          <Link href={`/p/${p.id}`} className="group block">
-            <span className="flex aspect-square items-center justify-center rounded-2xl border border-hairline bg-totemeal text-2xl font-extrabold tracking-tight group-hover:border-primary">
+        <li key={p.id} className="w-72 shrink-0 sm:w-auto">
+          <Link href={`/p/${p.id}`} className="flex h-full min-h-16 items-center gap-3 rounded-2xl border border-hairline bg-white p-3 hover:border-primary">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-totemeal text-sm font-extrabold tracking-tight" aria-hidden>
               {initials(p.name)}
             </span>
-            <span className="mt-2 block truncate text-sm font-semibold">{p.name}</span>
-            <VerifiedBadge partnerId={p.id} className="mt-1" />
-            <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${urgent ? "bg-express text-express" : "text-secondary"}`}>
-              {urgent ? "Needs help tonight" : `${open} open ${open === 1 ? "need" : "needs"}`}
+            <span className="min-w-0 flex-1">
+              <span className="block truncate font-semibold">{p.name}</span>
+              <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-secondary">
+                {open} open {open === 1 ? "need" : "needs"}
+                <VerifiedBadge partnerId={p.id} />
+              </span>
             </span>
+            {urgent && <span className="shrink-0 rounded-full bg-sale px-2.5 py-1 text-xs font-semibold text-white">Tonight</span>}
           </Link>
         </li>
       ))}
