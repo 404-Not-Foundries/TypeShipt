@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { addPledge, getState, resetState, setPledgeStatus, StoreError } from "@/lib/store";
+import { addDriver, addPledge, getState, removeDriver, resetState, setPledgeStatus, setRoutes, StoreError } from "@/lib/store";
+import type { RoutePlan } from "@/lib/types";
 
 describe("store pledges", () => {
   beforeEach(() => {
@@ -39,5 +40,40 @@ describe("store pledges", () => {
     setPledgeStatus(p.id, "received");
     setPledgeStatus(p.id, "received");
     expect(getState().needs.find((n) => n.id === "n-fh-socks")?.qtyReceived).toBe(5);
+  });
+});
+
+describe("store drivers and routes", () => {
+  beforeEach(() => {
+    resetState();
+  });
+
+  it("seeds 2 buses and a convertible", () => {
+    expect(getState().drivers.map((d) => d.size)).toEqual(["XL", "XL", "S"]);
+  });
+
+  it("adds a driver sized from the vehicle type, and removes it", () => {
+    const d = addDriver("  Van  ", "suv");
+    expect(d).toMatchObject({ name: "Van", size: "L", capacity: 50, kind: "shipt" });
+    removeDriver(d.id);
+    expect(getState().drivers.some((x) => x.id === d.id)).toBe(false);
+  });
+
+  it("rejects bad driver input", () => {
+    expect(() => addDriver("", "bus")).toThrow(StoreError);
+    expect(() => addDriver("x".repeat(41), "bus")).toThrow(StoreError);
+    expect(() => addDriver("Ok", "rocket")).toThrow(StoreError);
+    expect(() => addDriver("Ok", "toString")).toThrow(StoreError);
+    expect(() => addDriver("Ok", "bus", { lat: "a" })).toThrow(StoreError);
+    expect(() => removeDriver("nope")).toThrow(StoreError);
+  });
+
+  it("marks routed pledges batched and reverts ones dropped from every route", () => {
+    const a = addPledge({ needId: "n-fh-socks", qty: 1, fulfillment: "shipt" });
+    const route = { driverId: "d-bus-1", stops: [{ id: "s", kind: "dropoff", label: "", location: { lat: 0, lng: 0 }, pledgeIds: [a.id] }] } as RoutePlan;
+    setRoutes([route], [], null);
+    expect(getState().pledges[0].status).toBe("batched");
+    setRoutes([], [a.id], null);
+    expect(getState().pledges[0].status).toBe("pledged");
   });
 });
