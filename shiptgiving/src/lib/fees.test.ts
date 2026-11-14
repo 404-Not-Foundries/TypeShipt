@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { pledgeCost } from "@/lib/fees";
+import { mileageValue, pledgeCost } from "@/lib/fees";
 
 describe("pledgeCost", () => {
   it("charges items, full delivery fee and service for a solo Shipt pledge", () => {
@@ -22,5 +22,10 @@ describe("pledgeCost", () => {
   it("treats a missing or zero batch size as a solo donor", () => {
     expect(pledgeCost(1, 1, "shipt", 0).deliveryShare).toBe(9.99);
     expect(pledgeCost(1, 1, "shipt", Number.NaN).deliveryShare).toBe(9.99);
+  });
+
+  it("values a volunteer round trip at 14 cents a mile", () => {
+    expect(mileageValue(5)).toBe(1.4);
+    expect(mileageValue(-3)).toBe(0);
   });
 });
