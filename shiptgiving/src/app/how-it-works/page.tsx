@@ -17,13 +17,6 @@ const SECTIONS = [
   { id: "decisions", label: "Decisions" },
 ];
 
-const NUMBERS = [
-  { value: "215+", label: "men sheltered every night at Firehouse Ministries, which runs on in-kind gifts" },
-  { value: "146,000", label: "Birmingham residents living in food deserts" },
-  { value: "11", label: "real Birmingham nonprofits seeded with hours and accept rules" },
-  { value: "3", label: "ways to give: Shipt delivers, I'll drive it, porch pickup" },
-];
-
 const DECISIONS = [
   { title: "Next.js API routes", text: "One app, one language, one deploy. Pages and API share lib/types.ts, so a contract change breaks the build, not the demo." },
   { title: "In-memory store + 2 s polling", text: "One Node process is enough for a one-laptop demo: no database, no websockets. Every write returns a new state object; a database is the swap to deploy." },
@@ -53,24 +46,12 @@ export default function HowItWorksPage() {
       <section aria-labelledby="hiw-title" className="rounded-2xl bg-hero-sage p-6 sm:p-10">
         <p className="text-sm font-semibold">How it works</p>
         <h1 id="hiw-title" className="mt-1 text-[36px] font-extrabold leading-[1.1] tracking-tight sm:text-[52px]">
-          Birmingham&apos;s wishlists, filled by Shipt
+          Birmingham&apos;s wishlists, filled by community
         </h1>
         <p className="mt-3 max-w-2xl text-lg">
           Nonprofits post what they need tonight. Neighbors fill it in a few taps, as an ordinary Shipt gift order, by
           driving it, or by porch pickup. Pledges are batched into routes sized to tomorrow&apos;s drivers.
         </p>
-        <p className="mt-3 max-w-2xl text-secondary">
-          Giving goods today means buying the item, finding the drop-off hours, driving downtown and hoping it is still
-          needed. Nonprofits end up with 60 of one thing and none of what they asked for.
-        </p>
-        <dl className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {NUMBERS.map((n) => (
-            <div key={n.value} className="flex flex-col-reverse rounded-2xl bg-white p-4">
-              <dt className="text-sm text-secondary">{n.label}</dt>
-              <dd className="text-3xl font-extrabold tabular-nums">{n.value}</dd>
-            </div>
-          ))}
-        </dl>
         <nav aria-label="On this page" className="mt-6">
           <ul className="flex flex-wrap gap-2">
             {SECTIONS.map((s) => (
