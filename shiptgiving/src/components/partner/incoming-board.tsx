@@ -2,6 +2,7 @@
 import { useState } from "react";
 import type { Fulfillment, Need, Pledge, PledgeStatus } from "@/lib/types";
 import { confirmReceipt, errorMessage } from "./api";
+import { ALERT, BTN_PRIMARY, BTN_SECONDARY, PILL_MUTED } from "./styles";
 
 type Props = { pledges: Pledge[]; needs: Need[]; onChanged: () => void };
 
@@ -37,11 +38,11 @@ export function IncomingBoard({ pledges, needs, onChanged }: Props) {
 
   return (
     <section aria-labelledby="incoming-heading">
-      <h2 id="incoming-heading" className="text-lg font-semibold text-neutral-900">
+      <h2 id="incoming-heading" className="text-2xl font-bold text-primary">
         Incoming donations
       </h2>
       {error && (
-        <p role="alert" className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800">
+        <p role="alert" className={`mt-2 ${ALERT}`}>
           {error}
         </p>
       )}
@@ -49,24 +50,24 @@ export function IncomingBoard({ pledges, needs, onChanged }: Props) {
         {COLUMNS.map((col) => {
           const items = pledges.filter((p) => col.statuses.includes(p.status));
           return (
-            <div key={col.title} className="rounded-xl border border-black/10 bg-white p-3">
-              <h3 className="flex items-center justify-between text-sm font-semibold text-neutral-800">
+            <div key={col.title} className="rounded-2xl border border-hairline bg-white p-4">
+              <h3 className="flex items-center justify-between text-sm font-bold text-primary">
                 {col.title}
-                <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-700">{items.length}</span>
+                <span className={PILL_MUTED}>{items.length}</span>
               </h3>
               {items.length === 0 ? (
-                <p className="mt-2 text-sm text-neutral-500">{col.empty}</p>
+                <p className="mt-2 text-sm text-secondary">{col.empty}</p>
               ) : (
                 <ul className="mt-2 space-y-2">
                   {items.map((p) => {
                     const need = needs.find((n) => n.id === p.needId);
                     const delivered = p.status === "delivered";
                     return (
-                      <li key={p.id} className="rounded-lg bg-neutral-50 p-2 text-sm">
-                        <p className="font-medium text-neutral-900">
+                      <li key={p.id} className="rounded-xl bg-surface-muted p-3 text-sm">
+                        <p className="font-semibold text-primary">
                           {p.qty} × {need?.title ?? "Item"}
                         </p>
-                        <p className="text-neutral-600">
+                        <p className="text-secondary">
                           {p.donorName} · {FULFILLMENT_LABELS[p.fulfillment]}
                           {p.status === "batched" && " · on a route"}
                         </p>
@@ -75,11 +76,7 @@ export function IncomingBoard({ pledges, needs, onChanged }: Props) {
                             type="button"
                             disabled={pending !== null}
                             onClick={() => confirm(p)}
-                            className={`mt-2 rounded-full px-3 py-1 text-xs font-medium disabled:opacity-50 ${
-                              delivered
-                                ? "bg-emerald-700 text-white hover:bg-emerald-800"
-                                : "border border-neutral-300 bg-white text-neutral-800 hover:bg-neutral-100"
-                            }`}
+                            className={`mt-2 ${delivered ? BTN_PRIMARY : BTN_SECONDARY}`}
                           >
                             {pending === p.id ? "Confirming…" : `Confirm receipt of ${p.qty}`}
                           </button>

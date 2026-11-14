@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import type { Need, Partner, Weather } from "@/lib/types";
 import { errorMessage, loadWeather, simulateWeather, type Simulate } from "./api";
+import { ALERT, BTN_SECONDARY, CARD, HEADING, PILL_EXPRESS, PILL_MUTED, WARM_CARD } from "./styles";
 
 type Props = { partner: Partner; weather: Weather; needs: Need[]; onChanged: () => void };
 
@@ -43,36 +44,36 @@ export function SurgePanel({ partner, weather, needs, onChanged }: Props) {
 
   return (
     <section
-      className={`rounded-xl border p-4 ${weather.surge ? "border-orange-300 bg-orange-50" : "border-black/10 bg-white"}`}
+      className={weather.surge ? WARM_CARD : CARD}
       aria-labelledby="surge-heading"
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 id="surge-heading" className="text-lg font-semibold text-neutral-900">
+        <h2 id="surge-heading" className={HEADING}>
           Weather Surge
         </h2>
         <span
-          className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${weather.surge ? "bg-orange-600 text-white" : "bg-neutral-100 text-neutral-700"}`}
+          className={weather.surge ? PILL_EXPRESS : PILL_MUTED}
         >
           {weather.surge ? "Surge active" : "No surge"}
         </span>
       </div>
 
-      <p className="mt-2 text-sm text-neutral-800">
+      <p className="mt-2 text-sm text-primary">
         Tonight&apos;s low in Birmingham: <strong>{Math.round(weather.lowF)}°F</strong>
-        <span className="ml-2 text-neutral-500">
+        <span className="ml-2 text-secondary">
           {weather.simulated ? "Simulated for the demo" : "National Weather Service forecast"}
         </span>
       </p>
-      {weather.reason && <p className="mt-1 text-sm font-medium text-orange-900">{weather.reason}</p>}
+      {weather.reason && <p className={`mt-2 ${PILL_EXPRESS}`}>{weather.reason}</p>}
       {weather.alerts.length > 0 && (
-        <ul className="mt-1 list-inside list-disc text-sm text-neutral-700">
+        <ul className="mt-2 list-inside list-disc text-sm text-primary">
           {weather.alerts.map((a) => (
             <li key={a}>{a}</li>
           ))}
         </ul>
       )}
 
-      <p className="mt-2 text-sm text-neutral-700">
+      <p className="mt-2 text-sm text-secondary">
         {!surgePartner
           ? "Weather Surge is not turned on for this partner, so its needs keep their own urgency."
           : raised.length > 0
@@ -87,7 +88,7 @@ export function SurgePanel({ partner, weather, needs, onChanged }: Props) {
             type="button"
             disabled={busy}
             onClick={() => simulate(b.value)}
-            className="rounded-full border border-neutral-300 bg-white px-3 py-1.5 text-sm text-neutral-800 hover:bg-neutral-100 disabled:opacity-50"
+            className={BTN_SECONDARY}
           >
             {b.label}
           </button>
@@ -95,7 +96,7 @@ export function SurgePanel({ partner, weather, needs, onChanged }: Props) {
       </div>
 
       {error && (
-        <p role="alert" className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800">
+        <p role="alert" className={`mt-3 ${ALERT}`}>
           {error}
         </p>
       )}

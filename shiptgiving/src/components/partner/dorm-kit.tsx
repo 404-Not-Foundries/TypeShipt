@@ -2,6 +2,7 @@
 import { useMemo, useState } from "react";
 import type { CatalogItem, Need, Partner } from "@/lib/types";
 import { kitNeedItems, kitPrice, kitsCovered, resolveDormKit } from "./dorm-kit-data";
+import { ALERT, BTN_PRIMARY, FIELD, HEADING, SUCCESS, WARM_CARD } from "./styles";
 
 type Props = {
   partner: Pick<Partner, "id" | "features">;
@@ -49,35 +50,35 @@ export function DormKit({ partner, catalog, needs, onPublished }: Props) {
   }
 
   return (
-    <section aria-label="Dorm Kit bundle" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-neutral-900">
+    <section aria-label="Dorm Kit bundle" className={`${WARM_CARD} text-sm text-primary`}>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h3 className="text-base font-semibold">Dorm Kit</h3>
-        <p className="text-neutral-700">
-          <span className="font-semibold text-neutral-900">${price.toFixed(2)}</span> moves in one scholar
+        <h3 className={HEADING}>Dorm Kit</h3>
+        <p className="text-secondary">
+          <span className="text-base font-bold text-primary">${price.toFixed(2)}</span> moves in one scholar
         </p>
       </div>
-      <p className="mt-1 text-neutral-700">
+      <p className="mt-1 text-secondary">
         Everything one scholar needs on move-in day, posted as a bundle so donors can fund a whole kit.
       </p>
 
-      <ul className="mt-3 divide-y divide-amber-200/70 rounded-lg border border-amber-200 bg-white">
+      <ul className="mt-3 divide-y divide-hairline rounded-xl border border-hairline bg-white">
         {lines.map((l) => (
           <li key={l.item.id} className="flex items-center justify-between gap-3 px-3 py-2">
             <span>
-              <span className="font-medium">{l.label}</span>
-              <span className="block text-xs text-neutral-600">{l.item.name}</span>
+              <span className="font-semibold">{l.label}</span>
+              <span className="block text-xs text-secondary">{l.item.name}</span>
             </span>
-            <span className="shrink-0 tabular-nums text-neutral-700">
+            <span className="shrink-0 tabular-nums text-primary">
               {l.qty} × ${l.item.price.toFixed(2)}
             </span>
           </li>
         ))}
       </ul>
 
-      <p className="mt-3 text-neutral-700">
-        <span className="font-semibold text-neutral-900">{pledged}</span> {pledged === 1 ? "kit" : "kits"} fully pledged
+      <p className="mt-3 text-secondary">
+        <span className="font-bold text-primary">{pledged}</span> {pledged === 1 ? "kit" : "kits"} fully pledged
         {" · "}
-        <span className="font-semibold text-neutral-900">{received}</span> received
+        <span className="font-bold text-primary">{received}</span> received
       </p>
 
       <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -92,20 +93,20 @@ export function DormKit({ partner, catalog, needs, onPublished }: Props) {
               const n = Math.round(Number(e.target.value));
               setScholars(Number.isFinite(n) ? Math.min(MAX_SCHOLARS, Math.max(1, n)) : 1);
             }}
-            className="w-20 rounded-md border border-neutral-300 bg-white px-2 py-1.5 tabular-nums"
+            className={`${FIELD} w-20 tabular-nums`}
           />
         </label>
         <button
           type="button"
           onClick={publish}
           disabled={busy}
-          className="rounded-full bg-emerald-700 px-4 py-2 font-medium text-white hover:bg-emerald-800 disabled:opacity-60"
+          className={BTN_PRIMARY}
         >
           {busy ? "Posting…" : `Post ${scholars} ${scholars === 1 ? "kit" : "kits"} · $${(price * scholars).toFixed(2)}`}
         </button>
       </div>
       {message && (
-        <p role="status" className={`mt-2 ${message.ok ? "text-emerald-800" : "text-red-700"}`}>
+        <p role="status" className={`mt-3 ${message.ok ? SUCCESS : ALERT}`}>
           {message.text}
         </p>
       )}

@@ -23,30 +23,30 @@ export default function PartnerPage() {
   }, [refresh]);
 
   if (!state) {
-    return <p className="text-neutral-600">{error ?? "Loading the partner portal…"}</p>;
+    return <p className="text-secondary">{error ?? "Loading the partner portal…"}</p>;
   }
 
   const partner = state.partners.find((p) => p.id === pickedId) ?? state.partners[0];
-  if (!partner) return <p className="text-neutral-600">No partners are set up yet.</p>;
+  if (!partner) return <p className="text-secondary">No partners are set up yet.</p>;
 
   const needs = state.needs.filter((n) => n.partnerId === partner.id);
   const pledges = state.pledges.filter((p) => p.partnerId === partner.id);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-2xl font-bold text-neutral-900">{partner.name}</h1>
+            <h1 className="text-3xl font-extrabold leading-tight text-primary">{partner.name}</h1>
             <ConfidentialBadge partner={partner} />
           </div>
-          <p className="mt-1 max-w-2xl text-sm text-neutral-600">{partner.mission}</p>
+          <p className="mt-2 max-w-2xl text-sm text-secondary">{partner.mission}</p>
         </div>
         <PartnerPicker partners={state.partners} value={partner.id} onChange={setPickedId} />
       </header>
 
       {error && (
-        <p role="alert" className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">
+        <p role="alert" className="rounded-xl bg-totemeal px-3 py-2 text-sm text-primary">
           {error}
         </p>
       )}
