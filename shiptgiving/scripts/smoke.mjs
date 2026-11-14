@@ -64,7 +64,7 @@ async function main() {
       return;
     }
 
-    const pages = ["/", "/give", "/p/firehouse", "/p/pathways", "/partner", "/driver", "/impact", "/shipt", "/demo"];
+    const pages = ["/", "/give", "/p/firehouse", "/p/pathways", "/partner", "/driver", "/impact", "/shipt", "/demo", "/how-it-works"];
     await Promise.all(pages.map((path) => check(`Page ${path}`, async () => {
       await request(path, { page: true });
       return { detail: "HTTP 200" };
@@ -133,6 +133,12 @@ async function main() {
       pledges.push(pledge);
     }
 
+    await check("Page /shipt/order/[id]", async () => {
+      expect(pledges[0], "Prerequisite failed: Shipt pledge");
+      await request(`/shipt/order/${encodeURIComponent(pledges[0].id)}`, { page: true });
+      return { detail: "HTTP 200; order tracking for the Shipt pledge" };
+    });
+
     await check("Reject over-pledge", async () => {
       expect(context, "Prerequisite failed: open Firehouse need");
       await request("/api/pledges", {
@@ -162,18 +168,22 @@ async function main() {
     await check("Platform orders + privacy", async () => {
       let state = await request("/api/state");
       // Exercise both confidential partners instead of passing an empty privacy check.
+      const probeIds = [];
       for (const partnerId of ["pathways", "ywca"]) {
         const need = state.needs.find((entry) => entry.partnerId === partnerId && entry.qtyNeeded > entry.qtyPledged);
         expect(need && state.stores[0]?.id, "Missing confidential partner fixture");
-        await request("/api/pledges", {
+        const probe = await request("/api/pledges", {
           method: "POST", status: 201,
           body: { needId: need.id, qty: 1, fulfillment: "shipt", storeId: state.stores[0].id, donorName: "Smoke check" },
         });
+        probeIds.push(probe.id);
       }
       state = await request("/api/state");
       const payload = await request("/api/shipt/orders");
       expect(Array.isArray(payload.orders) && payload.orders.length >= 1, "Expected at least one Platform order");
-      expect(pledges[0] && payload.orders.some((order) => order.external_order_id === pledges[0].id), "New Shipt pledge has no Platform order");
+      const orderIds = new Set(payload.orders.map((order) => order.external_order_id));
+      expect(pledges[0] && orderIds.has(pledges[0].id), "New Shipt pledge has no Platform order");
+      expect(probeIds.every((id) => orderIds.has(id)), "A confidential Shipt pledge has no Platform order");
       const byId = new Map(state.pledges.map((pledge) => [pledge.id, pledge]));
       let confidential = 0;
       for (const order of payload.orders) {
