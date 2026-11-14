@@ -109,7 +109,7 @@ export function helpersByNeed(pledges: Pledge[]): Map<string, Helpers> {
 - **We chose one pledge = one small order** because it keeps Shipt's billing unchanged: each donor pays for their own items. Only the delivery fee is shared, and the share drops as more neighbors join the batch.
 - **We chose to compute the cost in one shared function** (`pledgeCost`) and call it on both client and server, because a preview that disagrees with the saved price is the worst bug a checkout can have. The server is still the source of truth.
 - **We chose `localStorage` for "Your pledges"** because there are no accounts. A donor can still see the status and the receipt without signing up. The trade-off: it's per browser, so clearing site data loses the list.
-- **We chose to hide porch pickup** when the partner doesn't accept it or the item is perishable, instead of showing an error later. The server (`addPledge`) enforces the same rule.
+- **We chose to hide porch pickup** when the partner doesn't accept it or the item is perishable, instead of showing an error later. The server (`addPledge`) checks that the partner accepts porch pickup.
 - **We chose a receipt that never promises a deduction.** It says "No goods or services were provided in return" (what the IRS asks for on gifts of $250 and up) and "consult a tax professional", because in-kind gifts are only deductible for itemizers.
 - **We chose Shipt's look** (product cards, pills, mint "Same-day" tag, full-pill buttons) from `docs/context/shipt-design.md`, so the feed could plausibly live inside the Shipt app.
 - **Accessibility:** the sheet is a real `role="dialog"` that focuses once and closes on Escape, the options are radio inputs, and tap targets are at least 44px (the last donor PR).
@@ -129,7 +129,7 @@ export function helpersByNeed(pledges: Pledge[]): Map<string, Helpers> {
 - **Is the receipt a tax document?** It's a written acknowledgment with the details the IRS asks for. It never promises a deduction and tells the donor to consult a tax professional.
 - **How do cards update live?** Every view polls `GET /api/state` every 2 seconds through `useAppState()`, and the meters, helpers and statuses are derived from that state on each render.
 - **How is the urgent row decided?** The weather surge on the server marks matching needs `urgent` with a `surgeReason`, and `sortNeeds` plus the feed's urgent filter put them in the top carousel.
-- **How did you test it?** `src/lib/fees.test.ts` covers the fee split, porch and volunteer rules, bad batch sizes and mileage. `community.test.ts` covers the helpers line.
+- **How did you test it?** `src/lib/fees.test.ts` covers the fee split, porch and volunteer rules, bad batch sizes and mileage. `community.test.ts` checks that helpers count people, not pledges, how anonymous neighbors are counted, and the 80% last-few rule. `sort-needs.test.ts` covers the closest and almost-filled sort orders.
 
 ## How I'd explain my part (30 seconds)
 
