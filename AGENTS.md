@@ -9,6 +9,7 @@ Shared instructions for every AI agent on this repo (Codex reads this file direc
 - `docs/context/`: research on Shipt and the hackathon.
 - `docs/context/shipt-research.md`: Shipt company, products, tech, what's known about SHIPT Hacks, and predicted tracks with project ideas.
 - `docs/WORKFLOW.md`: how the team works with Claude Code + Codex.
+- `docs/context/shipt-design.md`: **all UI must follow it** (Part 2 is the spec: colors, type, radii, components, accessibility). Use the shared tokens in `shiptgiving/src/app/globals.css` (`bg-totemeal`, `text-primary`, `bg-express`/`text-express`, `text-sale`, `border-hairline`, …) instead of raw Tailwind palette colors.
 
 ## Team
 Three UAB students. GitHub: `rmaytr`, `mulimangila`, `Viral-W`.

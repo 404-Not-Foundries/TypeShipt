@@ -12,7 +12,7 @@ const LINKS = [
 
 function NavLinks({ path }: { path: string | null }) {
   return (
-    <ul className="flex gap-1 text-sm">
+    <ul className="flex gap-1 text-sm font-semibold">
       {LINKS.map((l) => {
         const active =
           path !== null && (l.href === "/" ? path === "/" || path.startsWith("/p/") : path.startsWith(l.href));
@@ -21,7 +21,7 @@ function NavLinks({ path }: { path: string | null }) {
             <Link
               href={l.href}
               aria-current={active ? "page" : undefined}
-              className={`rounded-full px-3 py-1.5 ${active ? "bg-emerald-700 text-white" : "text-neutral-700 hover:bg-neutral-100"}`}
+              className={`inline-flex min-h-11 items-center rounded-full px-4 ${active ? "bg-primary text-white" : "text-primary hover:bg-surface-muted"}`}
             >
               {l.label}
             </Link>
@@ -38,12 +38,12 @@ function ActiveNavLinks() {
 
 export function RoleNav() {
   return (
-    <header className="sticky top-0 z-[1000] border-b border-black/10 bg-white/90 backdrop-blur">
+    <header className="sticky top-0 z-[1000] border-b border-hairline bg-white">
       <nav
-        className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-3"
+        className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2"
         aria-label="Main"
       >
-        <Link href="/" className="text-lg font-bold tracking-tight text-emerald-700">
+        <Link href="/" className="inline-flex min-h-11 items-center text-xl font-extrabold tracking-tight text-primary">
           ShiptGiving
         </Link>
         {/* usePathname() needs a Suspense boundary so dynamic routes like /p/[id] can prerender. */}
