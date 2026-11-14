@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { keywordParse } from "@/lib/ai";
 import { catalog } from "@/lib/seed-stub";
+import { catalog as realCatalog, partners } from "@/data";
 
 describe("keywordParse", () => {
   it("matches the demo sentence to catalog items with quantities", () => {
@@ -27,5 +28,13 @@ describe("keywordParse", () => {
 
   it("returns nothing when no catalog item fits", () => {
     expect(keywordParse("we need 5 pianos", catalog)).toEqual([]);
+  });
+
+  it("picks the socks that fit the partner when the request does not say", () => {
+    const text = "cold front tonight, need 40 pairs of socks and 20 blankets";
+    const firehouse = partners.find((p) => p.id === "firehouse");
+    const pathways = partners.find((p) => p.id === "pathways");
+    expect(keywordParse(text, realCatalog, firehouse).map((i) => i.itemId)).toContain("socks-mens");
+    expect(keywordParse(text, realCatalog, pathways).map((i) => i.itemId)).toContain("socks-womens");
   });
 });

@@ -47,29 +47,40 @@ function urgencyOf(text: string): Urgency {
   return "normal";
 }
 
-function bestMatch(segment: string, catalog: CatalogItem[]): CatalogItem | undefined {
+type Match = { item: CatalogItem; score: number; fit: number; ratio: number };
+
+/** Higher score wins; ties go to the item that fits the partner (e.g. "men" in a men's shelter), then the closer name. */
+function better(a: Match, b: Match): boolean {
+  if (a.score !== b.score) return a.score > b.score;
+  if (a.fit !== b.fit) return a.fit > b.fit;
+  return a.ratio > b.ratio;
+}
+
+function bestMatch(segment: string, catalog: CatalogItem[], context: Set<string>): CatalogItem | undefined {
   const words = new Set(tokens(segment).filter((t) => !/^\d+$/.test(t)));
-  let best: { item: CatalogItem; score: number; ratio: number } | undefined;
+  let best: Match | undefined;
   for (const item of catalog) {
     const name = new Set(tokens(`${item.name} ${item.id}`));
     const score = [...words].filter((w) => name.has(w)).length;
     if (score === 0) continue;
-    const ratio = score / name.size;
-    if (!best || score > best.score || (score === best.score && ratio > best.ratio)) best = { item, score, ratio };
+    const fit = [...name].filter((w) => context.has(w)).length;
+    const match = { item, score, fit, ratio: score / name.size };
+    if (!best || better(match, best)) best = match;
   }
   return best?.item;
 }
 
 /** Offline parser: splits the text into phrases and matches each to the closest catalog item. */
-export function keywordParse(text: string, catalog: CatalogItem[]): ParsedItem[] {
+export function keywordParse(text: string, catalog: CatalogItem[], partner?: Pick<Partner, "name" | "mission">): ParsedItem[] {
   const urgency = urgencyOf(text);
+  const context = new Set(partner ? tokens(`${partner.name} ${partner.mission}`) : []);
   const segments = text.split(/[,;.\n]+|\band\b|\bplus\b|&/i).map((s) => s.trim()).filter(Boolean);
   const anyQty = segments.some((s) => findQty(s) !== undefined);
   const byItem = new Map<string, ParsedItem>();
   for (const segment of segments) {
     const qty = findQty(segment);
     if (anyQty && qty === undefined) continue; // skip context phrases like "cold front tonight"
-    const item = bestMatch(segment, catalog);
+    const item = bestMatch(segment, catalog, context);
     if (!item) continue;
     const prior = byItem.get(item.id);
     const total = clampQty((prior?.qty ?? 0) + (qty ?? DEFAULT_QTY));
@@ -157,5 +168,5 @@ export async function parseNeed(text: string, catalog: CatalogItem[], partner?: 
       // fall through to the offline parser so the portal keeps working
     }
   }
-  return { items: keywordParse(text, catalog), source: "keywords" };
+  return { items: keywordParse(text, catalog, partner), source: "keywords" };
 }
