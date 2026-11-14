@@ -67,6 +67,7 @@ export const needs: Need[] = [
   // Ed Farm (classroom, new only)
   need("n-ef-headphones", "edfarm", "headphones", "Classroom headphones (teacher wishlist)", 28, { got: 10 }),
   need("n-ef-chargers", "edfarm", "usb-c-charger", "USB-C chargers for Student Fellows", 12),
+  need("n-ef-chromebooks", "edfarm", "chromebook", "Chromebooks for a classroom set (new only)", 6, { got: 1 }),
 
   // Birmingham Promise (dormKits)
   need("n-bp-dorm-kits", "promise", "dorm-kit", "Dorm move-in kits for spring scholars", 10, { got: 3, deadline: at("17:00", "2026-12-18") }),
