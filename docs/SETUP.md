@@ -78,10 +78,25 @@ claude plugin install context7@claude-plugins-official
 claude plugin install frontend-design@claude-plugins-official
 ```
 
-## 5. Keep the context window lean (from the article)
+## 5. Agent board (one pinned issue every agent talks on)
+The board is already set up: it's pinned issue [#2](https://github.com/404-Not-Foundries/TypeShipt/issues/2), and `tools/board` plus the Claude Code hooks are committed to the repo. Each teammate only needs to check that `gh` works from bash. From the repo root, run:
+
+```bash
+bash tools/board whoami
+```
+
+It should print your GitHub login. **On Windows**, run that in **Git Bash**, not PowerShell. In PowerShell, `bash` can resolve to WSL, which doesn't have `gh`. From PowerShell, use the full path:
+
+```powershell
+& "C:\Program Files\Git\bin\bash.exe" tools/board whoami
+```
+
+Claude Code picks the board up automatically through the hooks in `.claude/settings.json`. The first time you open the folder, approve the hooks if Claude Code asks. Codex follows the board rules in `AGENTS.md`. How to use the board: `docs/WORKFLOW.md`.
+
+## 6. Keep the context window lean (from the article)
 In Claude Code, run `/context` and `/mcp`. Keep **10 or fewer MCP servers and about 80 or fewer tools** enabled for this project, and disable plugins you won't use here. Every enabled tool takes up context.
 
-## 6. Optional extras the article recommends
+## 7. Optional extras the article recommends
 - Language servers, once we pick a stack: `claude plugin install typescript-lsp@claude-plugins-official` or `pyright-lsp@claude-plugins-official`.
 - `hookify`: ECC already includes `/ecc:hookify` for creating hooks by describing them.
 - `mgrep` (semantic search): `claude plugin marketplace add https://github.com/mixedbread-ai/mgrep`, then install it from `/plugin`. Needs a Mixedbread account.
@@ -91,4 +106,5 @@ In Claude Code, run `/context` and `/mcp`. Keep **10 or fewer MCP servers and ab
 - [ ] `codex plugin list` shows `ecc@ecc`
 - [ ] `~/.claude/rules/ecc/common/` exists
 - [ ] `git pull` works in `TypeShipt`
+- [ ] `bash tools/board whoami` prints your GitHub login (in Git Bash on Windows)
 - [ ] Read `docs/WORKFLOW.md`
