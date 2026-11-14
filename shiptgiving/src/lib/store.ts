@@ -4,7 +4,7 @@ import type {
   AppState, Driver, Fulfillment, LatLng, Need, Pledge, PledgeStatus, RoutePlan, RouteSummary, Store, Urgency, VehicleType, Weather,
 } from "@/lib/types";
 import { FULFILLMENTS, PLEDGE_STATUSES, VEHICLES } from "@/lib/types";
-import { catalog, needs, partners } from "@/lib/seed-stub";
+import { catalog, needs, partners } from "@/data";
 import { STORE_SNAPSHOT } from "@/lib/stores/snapshot";
 import { pledgeCost } from "@/lib/fees";
 
