@@ -37,9 +37,10 @@ Everything works without keys: need parsing falls back to keywords, and prices f
 
 | View | Path | What it does |
 |---|---|---|
-| **Give** | `/`, `/p/[id]` | Needs feed (urgent first, weather banner, filters), partner pages, and the fill-a-need sheet: quantity, the three delivery options, store picker, cost breakdown, your pledges and a written acknowledgment once the partner confirms receipt. |
-| **Partner** | `/partner` | Nonprofit staff post a need in plain English ("cold front tonight, need 40 pairs of men's socks"), see incoming pledges, and confirm receipt. Includes the Weather Surge panel, accept rules, dorm kits and the confidential-address notice. |
-| **Driver** | `/driver` | "Tomorrow's drivers" (add or remove vehicles), Generate routes, a map with one color per route, and route cards with load, ETAs, late badges and Mark picked up / Mark delivered. |
+| **Home** | `/` | What ShiptGiving is, a live strip (urgent needs, items pledged, partners, weather surge) and a card for each view below. |
+| **Give** | `/give`, `/p/[id]` | Needs feed (urgent first, weather banner, filters), partner pages, and the fill-a-need sheet: quantity, the three delivery options, store picker, cost breakdown, your pledges and a written acknowledgment once the partner confirms receipt. |
+| **Nonprofits** | `/partner` | Nonprofit staff post a need in plain English ("cold front tonight, need 40 pairs of men's socks"), see incoming pledges, and confirm receipt. Includes the Weather Surge panel, accept rules, dorm kits and the confidential-address notice. |
+| **Drivers** | `/driver` | "Tomorrow's drivers" (add or remove vehicles), Generate routes, a map with one color per route, and route cards with load, ETAs, late badges and Mark picked up / Mark delivered. |
 | **Impact** | `/impact` | Items pledged and delivered, partners helped, value of goods, trips and minutes saved by routing, progress per partner, recent activity. |
 
 `/demo` is a presenter view that shows Give, Partner and Driver side by side with the demo controls. All views read the same state and refresh every 2 seconds, so a pledge made in one window shows up in the others.
