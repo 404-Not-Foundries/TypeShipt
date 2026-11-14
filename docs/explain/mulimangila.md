@@ -109,7 +109,7 @@ export function helpersByNeed(pledges: Pledge[]): Map<string, Helpers> {
 - **We chose one pledge = one small order** because it keeps Shipt's billing unchanged: each donor pays for their own items. Only the delivery fee is shared, and the share drops as more neighbors join the batch.
 - **We chose to compute the cost in one shared function** (`pledgeCost`) and call it on both client and server, because a preview that disagrees with the saved price is the worst bug a checkout can have. The server is still the source of truth.
 - **We chose `localStorage` for "Your pledges"** because there are no accounts. A donor can still see the status and the receipt without signing up. The trade-off: it's per browser, so clearing site data loses the list.
-- **We chose to hide porch pickup** when the partner doesn't accept it or the item is perishable, instead of showing an error later. The server (`addPledge`) checks that the partner accepts porch pickup.
+- **We chose to hide porch pickup** when the partner doesn't accept it or the item is perishable, instead of showing an error later. The server enforces both in `addPledge`.
 - **We chose a receipt that never promises a deduction.** It says "No goods or services were provided in return" (what the IRS asks for on gifts of $250 and up) and "consult a tax professional", because in-kind gifts are only deductible for itemizers.
 - **We chose Shipt's look** (product cards, pills, mint "Same-day" tag, full-pill buttons) from `docs/context/shipt-design.md`, so the feed could plausibly live inside the Shipt app.
 - **Accessibility:** the sheet is a real `role="dialog"` that focuses once and closes on Escape, the options are radio inputs, and tap targets are at least 44px (the last donor PR).
