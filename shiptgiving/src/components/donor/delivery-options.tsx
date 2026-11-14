@@ -67,7 +67,7 @@ export function DeliveryOptions(p: Props) {
         </div>
       )}
 
-      <CostBreakdown cost={p.cost} donors={p.donors} />
+      <CostBreakdown cost={p.cost} donors={p.donors} fulfillment={p.value} />
     </div>
   );
 }
