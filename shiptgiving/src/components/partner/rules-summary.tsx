@@ -1,4 +1,5 @@
 import type { Feature, Partner } from "@/lib/types";
+import { ConfidentialBadge, publicAddress } from "./confidential-badge";
 import { formatWindow } from "./format";
 
 const FEATURE_LABELS: Record<Feature, string> = {
@@ -10,7 +11,6 @@ const FEATURE_LABELS: Record<Feature, string> = {
 };
 
 export function RulesSummary({ partner }: { partner: Partner }) {
-  const confidential = partner.features.includes("confidential");
   const assumed = partner.receiving.some((w) => w.assumed);
   const { accepts } = partner;
   const rules = [
@@ -29,12 +29,8 @@ export function RulesSummary({ partner }: { partner: Partner }) {
         <div>
           <dt className="font-medium text-neutral-500">Deliver to</dt>
           <dd className="text-neutral-900">
-            {confidential ? (partner.dropPoint?.address ?? "Public drop point") : partner.address}
-            {confidential && (
-              <span className="ml-2 rounded-full bg-violet-100 px-2 py-0.5 text-xs font-medium text-violet-900">
-                Confidential: drivers and donors only see this drop point
-              </span>
-            )}
+            {publicAddress(partner)}
+            <ConfidentialBadge partner={partner} className="ml-2" />
           </dd>
         </div>
 
