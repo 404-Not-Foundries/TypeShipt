@@ -8,7 +8,7 @@ Birmingham nonprofits post what they need, like a wishlist. Anyone can fill a ne
 
 Pledges are then batched into routes for tomorrow's drivers, sized to the vehicles they actually drive and timed to each nonprofit's receiving hours.
 
-Built at SHIPT Hacks 2026 ("Build a Better Birmingham") by team 404 Not Foundries. The full spec is in [`docs/context/project.md`](../docs/context/project.md).
+Built at SHIPT Hacks 2026 ("Build a Better Birmingham") by team 404 Not Foundries. The full spec is in [`docs/context/project.md`](../docs/context/project.md). For a one-page overview see [`docs/OVERVIEW.md`](../docs/OVERVIEW.md); the in-app walkthrough is at `/how-it-works`.
 
 ## The problem in Birmingham
 
