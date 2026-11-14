@@ -82,6 +82,8 @@ export function addPledge(input: NewPledge): Pledge {
   if (qty > remaining) throw new StoreError(`Only ${remaining} still needed`, 409);
   const partner = state.partners.find((p) => p.id === need.partnerId);
   if (fulfillment === "porch" && !partner?.accepts.porchPickup) throw new StoreError("This partner does not take porch pickups");
+  const item = state.catalog.find((c) => c.id === need.itemId);
+  if (fulfillment === "porch" && item?.perishable) throw new StoreError("Perishable items can't go by porch pickup; choose Shipt delivery");
   if (fulfillment === "porch" && !isLatLng(input.porch)) throw new StoreError("Porch pickup needs a location");
   const storeId = typeof input.storeId === "string" ? input.storeId : undefined;
   if (storeId && !state.stores.some((s) => s.id === storeId)) throw new StoreError("Unknown store");
@@ -89,7 +91,6 @@ export function addPledge(input: NewPledge): Pledge {
     ? input.donorName.trim().slice(0, MAX_NAME)
     : "A neighbor";
 
-  const item = state.catalog.find((c) => c.id === need.itemId);
   const batchDonors = state.pledges.filter(
     (p) => p.partnerId === need.partnerId && p.fulfillment !== "volunteer" && (p.status === "pledged" || p.status === "batched"),
   ).length + 1;

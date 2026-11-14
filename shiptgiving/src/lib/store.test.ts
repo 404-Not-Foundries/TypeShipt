@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { addDriver, addPledge, getState, removeDriver, resetState, setPledgeStatus, setRoutes, StoreError } from "@/lib/store";
+import { addDriver, addNeeds, addPledge, getState, removeDriver, resetState, setPledgeStatus, setRoutes, StoreError } from "@/lib/store";
 import type { RoutePlan } from "@/lib/types";
 
 describe("store pledges", () => {
@@ -33,6 +33,15 @@ describe("store pledges", () => {
     expect(() => addPledge({ needId: "n-fh-socks", qty: 1.5, fulfillment: "shipt" })).toThrow(StoreError);
     expect(() => addPledge({ needId: "n-fh-socks", qty: 1, fulfillment: "teleport" })).toThrow(StoreError);
     expect(() => addPledge({ needId: "n-fh-socks", qty: 1, fulfillment: "porch" })).toThrow(StoreError);
+  });
+
+  it("refuses porch pickup for perishable items, even at a partner that takes porch pickups", () => {
+    const [milk] = addNeeds("firehouse", [{ itemId: "milk-gallon", qty: 5 }]);
+    const porch = { lat: 33.51, lng: -86.8 };
+    expect(() => addPledge({ needId: milk.id, qty: 1, fulfillment: "porch", porch })).toThrow(/perishable/i);
+    expect(getState().pledges).toEqual([]);
+    expect(addPledge({ needId: milk.id, qty: 1, fulfillment: "shipt" }).fulfillment).toBe("shipt");
+    expect(addPledge({ needId: "n-fh-socks", qty: 1, fulfillment: "porch", porch }).fulfillment).toBe("porch");
   });
 
   it("counts received items only once", () => {
