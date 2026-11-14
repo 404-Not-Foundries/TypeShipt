@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { planRoutes } from "@/lib/routing";
+import { minutesFor, pathMiles } from "@/lib/routing/geo";
 import { VEHICLES } from "@/lib/types";
 import type { AppState, Driver, Fulfillment, Partner, Pledge, Store, VehicleType } from "@/lib/types";
 
@@ -92,11 +93,34 @@ describe("fleet routing", () => {
     }
   });
 
-  it("beats one separate trip per pledge", () => {
+  it("beats each donation driven as its own round trip, in minutes and miles", () => {
     const pledges = Array.from({ length: 12 }, (_, i) => pledge(["north", "south", "east"][i % 3], 3));
     const plan = planRoutes(state([driver("bus", "bus")], pledges), DAY);
     expect(plan.routes[0].naiveMiles).toBeGreaterThanOrEqual(plan.routes[0].miles);
+    expect(plan.routes[0].naiveMinutes).toBeGreaterThanOrEqual(plan.routes[0].minutes);
     expect(plan.summary.naiveMinutes).toBeGreaterThan(plan.summary.minutes);
+    expect(plan.summary.naiveMiles).toBeGreaterThan(plan.summary.miles);
+  });
+
+  it("counts the drive back and 5 minutes per stop, for the route and the baseline", () => {
+    const start = { lat: 33.5186, lng: -86.8104 };
+    const partners = [partner("north", 33.56, -86.8)];
+    const shipt = planRoutes(state([driver("bus", "bus")], [pledge("north", 1, { storeId: "s-a" })], partners), DAY).routes[0];
+    const loop = pathMiles([start, { lat: 33.53, lng: -86.8 }, { lat: 33.56, lng: -86.8 }, start]);
+    // One pledge: the route is exactly the solo round trip start -> store -> nonprofit -> start, with 2 stops.
+    expect(shipt.miles).toBeCloseTo(loop, 1);
+    expect(shipt.minutes).toBe(Math.round(minutesFor(loop) + 10));
+    expect([shipt.naiveMiles, shipt.naiveMinutes]).toEqual([shipt.miles, shipt.minutes]);
+    // The drop-off ETA is the drive so far plus the 5 minutes spent at the store.
+    const arrives = Math.round(9 * 60 + minutesFor(pathMiles([start, { lat: 33.53, lng: -86.8 }, { lat: 33.56, lng: -86.8 }])) + 5);
+    expect(shipt.stops.at(-1)?.eta).toBe(`09:${String(arrives - 9 * 60).padStart(2, "0")}`);
+
+    // A porch donor's own trip is home -> nonprofit -> home, with 1 stop.
+    const porch = { lat: 33.55, lng: -86.8 };
+    const own = planRoutes(state([driver("bus", "bus")], [pledge("north", 1, { fulfillment: "porch", porch })], partners), DAY).routes[0];
+    const there = pathMiles([porch, { lat: 33.56, lng: -86.8 }]);
+    expect(own.naiveMiles).toBeCloseTo(2 * there, 1);
+    expect(own.naiveMinutes).toBe(Math.round(minutesFor(2 * there) + 5));
   });
 
   it("counts drop-offs outside the receiving window as late", () => {

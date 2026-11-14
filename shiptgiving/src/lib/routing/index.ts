@@ -18,7 +18,9 @@ export function summarize(routes: RoutePlan[]): RouteSummary {
     routes: routes.length,
     items: sum((r) => r.load),
     minutes: sum((r) => r.minutes),
+    miles: Math.round(sum((r) => r.miles) * 10) / 10,
     naiveMinutes: sum((r) => r.naiveMinutes),
+    naiveMiles: Math.round(sum((r) => r.naiveMiles) * 10) / 10,
     label: label || "No routes",
   };
 }

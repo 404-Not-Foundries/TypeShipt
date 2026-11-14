@@ -4,6 +4,8 @@ import { dropLocation, toMinutes, windowFor } from "@/lib/routing/assign";
 import { minutesFor, pathMiles, roadMiles } from "@/lib/routing/geo";
 
 export const START_MINUTES = 9 * 60; // routes leave at 9:00 AM
+/** Fixed time at every pickup and drop-off (parking, checkout, hand-off), for routes and the baseline alike. */
+export const STOP_MINUTES = 5;
 
 type Place = { key: string; label: string; location: LatLng };
 
@@ -57,12 +59,16 @@ const clock = (minutes: number) => {
 
 const round1 = (n: number) => Math.round(n * 10) / 10;
 
-/** Builds one driver's route: start, every pickup, then every drop-off, with ETAs ("HH:MM") from a 9:00 AM start. */
+/**
+ * Builds one driver's route: start, every pickup, then every drop-off, with ETAs ("HH:MM") from a 9:00 AM start.
+ * Totals cover the whole round trip (the drive back to the start included) plus STOP_MINUTES per stop.
+ */
 export function buildRoute(driver: Driver, pledges: Pledge[], state: AppState, day: number): RoutePlan {
   const partnerById = new Map(state.partners.map((p) => [p.id, p]));
   const pickups = new Map<string, Stop>();
   const dropoffs = new Map<string, Stop>();
   let naiveMiles = 0;
+  let naiveStops = 0;
 
   for (const pledge of pledges) {
     const partner = partnerById.get(pledge.partnerId);
@@ -79,8 +85,13 @@ export function buildRoute(driver: Driver, pledges: Pledge[], state: AppState, d
       id: `${driver.id}-dropoff-${partner.id}`, kind: "dropoff", label: partner.name, location: drop,
       pledgeIds: [...(dropoffs.get(partner.id)?.pledgeIds ?? []), pledge.id], window: windowFor(partner, day),
     });
-    // Baseline: this pledge driven on its own, start -> pickup -> drop-off.
-    naiveMiles += pathMiles([driver.start, ...(pickup ? [pickup.location] : []), drop]);
+    // Baseline: each donation as its own round trip, the way in-kind donations work today.
+    // A porch donor drives home -> nonprofit -> home; a store order is start -> store -> nonprofit -> start.
+    const soloTrip = pledge.fulfillment === "porch" && pledge.porch
+      ? [pledge.porch, drop, pledge.porch]
+      : [driver.start, ...(pickup ? [pickup.location] : []), drop, driver.start];
+    naiveMiles += pathMiles(soloTrip);
+    naiveStops += soloTrip.length - 2;
   }
 
   const shop = orderStops(driver.start, [...pickups.values()]);
@@ -91,7 +102,7 @@ export function buildRoute(driver: Driver, pledges: Pledge[], state: AppState, d
   let lateStops = 0;
   const stops = [start, ...shop, ...deliver].map((stop, i, all): Stop => {
     if (i > 0) miles += roadMiles(all[i - 1].location, stop.location);
-    const arrives = START_MINUTES + minutesFor(miles);
+    const arrives = START_MINUTES + minutesFor(miles) + STOP_MINUTES * Math.max(0, i - 1);
     if (stop.kind === "dropoff") {
       const w = stop.window;
       if (!w || arrives < toMinutes(w.open) || arrives > toMinutes(w.close)) lateStops += 1;
@@ -99,10 +110,12 @@ export function buildRoute(driver: Driver, pledges: Pledge[], state: AppState, d
     return { ...stop, eta: clock(arrives) };
   });
 
+  miles += roadMiles(stops.at(-1)!.location, driver.start); // the drive back
+
   return {
     driverId: driver.id, driverName: driver.name, size: driver.size, capacity: driver.capacity,
     load: pledges.reduce((sum, p) => sum + p.qty, 0),
-    stops, minutes: Math.round(minutesFor(miles)), miles: round1(miles),
-    naiveMinutes: Math.round(minutesFor(naiveMiles)), naiveMiles: round1(naiveMiles), lateStops,
+    stops, minutes: Math.round(minutesFor(miles) + STOP_MINUTES * (stops.length - 1)), miles: round1(miles),
+    naiveMinutes: Math.round(minutesFor(naiveMiles) + STOP_MINUTES * naiveStops), naiveMiles: round1(naiveMiles), lateStops,
   };
 }

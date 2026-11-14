@@ -32,13 +32,19 @@ export function ImpactStats({ state }: { state: AppState }) {
               <dd className="text-3xl font-bold tabular-nums">{Math.max(0, routed.size - routes.length)}</dd>
             </div>
             {summary && (
-              <div>
-                <dt className="text-sm text-emerald-100">Minutes saved</dt>
-                <dd className="text-3xl font-bold tabular-nums">{Math.max(0, summary.naiveMinutes - summary.minutes).toLocaleString(undefined, { maximumFractionDigits: 1 })}</dd>
-              </div>
+              <>
+                <div>
+                  <dt className="text-sm text-emerald-100">Minutes saved</dt>
+                  <dd className="text-3xl font-bold tabular-nums">{Math.max(0, summary.naiveMinutes - summary.minutes).toLocaleString(undefined, { maximumFractionDigits: 1 })}</dd>
+                </div>
+                <div>
+                  <dt className="text-sm text-emerald-100">Miles saved</dt>
+                  <dd className="text-3xl font-bold tabular-nums">{Math.max(0, summary.naiveMiles - summary.miles).toLocaleString(undefined, { maximumFractionDigits: 0 })}</dd>
+                </div>
+              </>
             )}
           </dl>
-          <p className="mt-3 text-sm text-emerald-100">Estimated against one separate trip for each routed pledge.</p>
+          <p className="mt-3 text-sm text-emerald-100">Compared with each donation driven as its own round trip, the way in-kind donations work today.</p>
         </div>
       )}
     </section>

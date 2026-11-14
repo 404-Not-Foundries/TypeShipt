@@ -81,13 +81,13 @@ describe("store drivers and routes", () => {
     const a = addPledge({ needId: "n-fh-socks", qty: 1, fulfillment: "shipt" });
     const b = addPledge({ needId: "n-fh-blankets", qty: 2, fulfillment: "shipt" });
     const route = (driverId: string, pledgeId: string, load: number) => ({
-      driverId, size: "XL", load, minutes: 10, naiveMinutes: 20,
+      driverId, size: "XL", load, minutes: 10, miles: 4, naiveMinutes: 20, naiveMiles: 9,
       stops: [{ id: driverId, kind: "dropoff", label: "", location: { lat: 0, lng: 0 }, pledgeIds: [pledgeId] }],
     }) as RoutePlan;
-    setRoutes([route("d-bus-1", a.id, 1), route("d-bus-2", b.id, 2)], [], { routes: 2, items: 3, minutes: 20, naiveMinutes: 40, label: "2 XL routes" });
+    setRoutes([route("d-bus-1", a.id, 1), route("d-bus-2", b.id, 2)], [], { routes: 2, items: 3, minutes: 20, miles: 8, naiveMinutes: 40, naiveMiles: 18, label: "2 XL routes" });
     removeDriver("d-bus-1");
     expect(getState().routes.map((r) => r.driverId)).toEqual(["d-bus-2"]);
-    expect(getState().routeSummary).toMatchObject({ routes: 1, items: 2, label: "1 XL route" });
+    expect(getState().routeSummary).toMatchObject({ routes: 1, items: 2, miles: 4, naiveMiles: 9, label: "1 XL route" });
     expect(getState().pledges.map((p) => p.status)).toEqual(["pledged", "batched"]);
     removeDriver("d-bus-2");
     expect(getState().routeSummary).toBeNull();
