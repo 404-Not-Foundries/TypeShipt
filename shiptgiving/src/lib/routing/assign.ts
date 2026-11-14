@@ -8,9 +8,14 @@ export type Assignment = { driver: Driver; pledges: Pledge[]; load: number };
 export const isRoutable = (p: Pledge) =>
   (p.fulfillment === "shipt" || p.fulfillment === "porch") && (p.status === "pledged" || p.status === "batched");
 
+const isConfidential = (partner: Partner) => partner.features.includes("confidential");
+
+/** A confidential partner with no public drop point is never routed: its address must not reach a driver. */
+const hasSafeDrop = (partner: Partner) => !isConfidential(partner) || Boolean(partner.dropPoint);
+
 /** Where a driver drops off: confidential partners use their public drop point. */
 export function dropLocation(partner: Partner): LatLng {
-  return partner.features.includes("confidential") && partner.dropPoint ? partner.dropPoint.location : partner.location;
+  return isConfidential(partner) && partner.dropPoint ? partner.dropPoint.location : partner.location;
 }
 
 export const toMinutes = (hhmm: string) => {
@@ -35,9 +40,9 @@ export function windowFor(partner: Partner, day: number): { open: string; close:
  * from the driver's start, loading whole pledges while they fit. Pledges that fit no vehicle come back as unrouted.
  */
 export function assignPledges(state: AppState, day: number): { assignments: Assignment[]; unrouted: string[] } {
-  const partnerById = new Map(state.partners.map((p) => [p.id, p]));
+  const partnerById = new Map(state.partners.filter(hasSafeDrop).map((p) => [p.id, p]));
   const open = state.pledges.filter(isRoutable);
-  // A pledge whose partner is gone can't be delivered, so it is never loaded.
+  // A pledge with no partner to deliver to (gone, or no safe drop point) is never loaded.
   const taken = new Set(open.filter((p) => !partnerById.has(p.partnerId)).map((p) => p.id));
   const undeliverable = [...taken];
 

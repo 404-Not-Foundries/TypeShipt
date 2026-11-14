@@ -7,6 +7,7 @@ import { FULFILLMENTS, PLEDGE_STATUSES, VEHICLES } from "@/lib/types";
 import { catalog, needs, partners } from "@/data";
 import { STORE_SNAPSHOT } from "@/lib/stores/snapshot";
 import { pledgeCost } from "@/lib/fees";
+import { summarize } from "@/lib/routing";
 
 const MAX_NAME = 60;
 const MAX_DRIVER_NAME = 40;
@@ -189,10 +190,14 @@ export function addDriver(name: unknown, vehicle: unknown, start?: unknown): Dri
   return driver;
 }
 
+/** Removes a driver. Its route goes too: those pledges return to "pledged" and the summary covers the routes left. */
 export function removeDriver(id: string): void {
   const state = getState();
   if (!state.drivers.some((d) => d.id === id)) throw new StoreError("Unknown driver", 404);
-  commit({ ...state, drivers: state.drivers.filter((d) => d.id !== id), routes: state.routes.filter((r) => r.driverId !== id) });
+  commit({ ...state, drivers: state.drivers.filter((d) => d.id !== id) });
+  if (!state.routes.some((r) => r.driverId === id)) return;
+  const routes = state.routes.filter((r) => r.driverId !== id);
+  setRoutes(routes, state.unrouted, routes.length > 0 ? summarize(routes) : null);
 }
 
 /** Saves a route plan. Pledges on a route become "batched"; batched pledges left off every route go back to "pledged". */
