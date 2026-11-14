@@ -7,6 +7,7 @@ Shared instructions for every AI agent on this repo (Codex reads this file direc
 ## Read before planning anything
 - `docs/context/project.md`: what we are building, scope, stack, demo plan, who owns what.
 - `docs/context/`: research on Shipt and the hackathon.
+- `docs/context/shipt-research.md`: Shipt company, products, tech, what's known about SHIPT Hacks, and predicted tracks with project ideas.
 - `docs/WORKFLOW.md`: how the team works with Claude Code + Codex.
 
 ## Team
