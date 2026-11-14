@@ -1,3 +1,4 @@
+import { VerifiedBadge } from "@/components/partner/verified-badge";
 import type { Need, Partner } from "@/lib/types";
 import { dropOff, formatWindow, hoursAssumed } from "./geo";
 
@@ -24,7 +25,10 @@ export function PartnerFacts({ partner, needs }: { partner: Partner; needs: Need
     <header className="space-y-4">
       <div>
         <h1 className="text-[32px] font-extrabold leading-[1.15] sm:text-[40px]">{partner.name}</h1>
-        <p className="text-sm text-secondary">{partner.neighborhood}</p>
+        <div className="mt-1 flex flex-wrap items-center gap-2">
+          <span className="text-sm text-secondary">{partner.neighborhood}</span>
+          <VerifiedBadge partnerId={partner.id} />
+        </div>
         <p className="mt-2 text-primary">{partner.mission}</p>
         {partner.features.length > 0 && (
           <ul className="mt-2 flex flex-wrap gap-1.5">

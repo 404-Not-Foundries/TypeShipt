@@ -2,6 +2,8 @@
 import Link from "next/link";
 import { formatUsd } from "@/lib/fees";
 import type { Need, Partner } from "@/lib/types";
+import { CheckIcon } from "@/components/partner/verified-badge";
+import { getVerification } from "@/components/partner/verification";
 import { CategoryArt } from "./category-art";
 import { type Helpers, helpersLine, isLastFew } from "./community";
 
@@ -55,8 +57,14 @@ export function NeedCard({ need, partner, category, price, helpers, onFill, clas
         {price !== undefined && <p className="font-bold">about {formatUsd(price)} each</p>}
         <h3 className="line-clamp-2 text-[15px] leading-snug">{need.title}</h3>
         {partner && (
-          <Link href={`/p/${partner.id}`} className="block truncate text-[13px] text-secondary hover:text-primary hover:underline">
-            {partner.name}
+          <Link href={`/p/${partner.id}`} className="flex items-center gap-1 text-[13px] text-secondary hover:text-primary hover:underline">
+            <span className="truncate">{partner.name}</span>
+            {getVerification(partner.id).verified && (
+              <span className="shrink-0 text-express" title="Verified nonprofit (IRS records)">
+                <CheckIcon />
+                <span className="sr-only">, verified nonprofit</span>
+              </span>
+            )}
           </Link>
         )}
         <div className="flex items-center gap-2 pt-0.5" aria-label={`${need.qtyPledged} of ${need.qtyNeeded} pledged`}>
