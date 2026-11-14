@@ -92,7 +92,7 @@ export function RouteCard({ route, color, pledges, onChange }: Props) {
               <p className="text-sm font-medium">
                 <span className="sr-only">{s.kind === "start" ? "Start" : `Stop ${nums[i]}`}: </span>
                 <span aria-hidden>{s.kind === "pickup" ? "⬆ " : s.kind === "dropoff" ? "⬇ " : ""}</span>
-                {s.kind === "pickup" ? "Pick up at " : s.kind === "dropoff" ? "Drop off at " : "Start at "}
+                {s.kind === "pickup" ? "Pick up at " : s.kind === "dropoff" ? "Drop off at " : ""}
                 {s.label}
               </p>
               <p className="text-xs text-neutral-600">
