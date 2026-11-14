@@ -111,4 +111,12 @@ describe("fleet routing", () => {
     const [route] = planRoutes(state([driver("bus", "bus")], [pledge("safe", 1)], partners), DAY).routes;
     expect(route.stops.at(-1)?.location).toEqual(dropPoint.location);
   });
+
+  it("never routes a confidential partner that has no public drop point", () => {
+    const hidden = partner("hidden", 33.6, -86.9, "18:00", { features: ["confidential"] });
+    const unsafe = pledge("hidden", 1);
+    const plan = planRoutes(state([driver("bus", "bus")], [unsafe, pledge("open", 1)], [hidden, partner("open", 33.47, -86.82)]), DAY);
+    expect(plan.unrouted).toEqual([unsafe.id]);
+    expect(JSON.stringify(plan.routes)).not.toContain(JSON.stringify(hidden.location));
+  });
 });

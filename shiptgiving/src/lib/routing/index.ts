@@ -8,7 +8,7 @@ export type FleetPlan = { routes: RoutePlan[]; unrouted: string[]; summary: Rout
 
 const SIZES: VehicleSize[] = ["XL", "L", "M", "S"];
 
-function summarize(routes: RoutePlan[]): RouteSummary {
+export function summarize(routes: RoutePlan[]): RouteSummary {
   const label = SIZES.map((size) => ({ size, n: routes.filter((r) => r.size === size).length }))
     .filter(({ n }) => n > 0)
     .map(({ size, n }) => `${n} ${size} route${n === 1 ? "" : "s"}`)
