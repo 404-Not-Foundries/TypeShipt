@@ -1,13 +1,17 @@
 // In-memory app state shared by every API route. Owner: rmaytr.
 // shortcut: lives in one Node process (fine for a one-laptop demo); swap for a database to deploy.
-import type { AppState, Fulfillment, LatLng, Need, Pledge, PledgeCost, PledgeStatus, Store, Urgency, Weather } from "@/lib/types";
-import { FULFILLMENTS, PLEDGE_STATUSES } from "@/lib/types";
+import type {
+  AppState, Driver, Fulfillment, LatLng, Need, Pledge, PledgeStatus, RoutePlan, RouteSummary, Store, Urgency, VehicleType, Weather,
+} from "@/lib/types";
+import { FULFILLMENTS, PLEDGE_STATUSES, VEHICLES } from "@/lib/types";
 import { catalog, needs, partners } from "@/lib/seed-stub";
 import { STORE_SNAPSHOT } from "@/lib/stores/snapshot";
+import { pledgeCost } from "@/lib/fees";
 
-export const BATCH_DELIVERY_FEE = 9.99;
-export const SERVICE_RATE = 0.05;
 const MAX_NAME = 60;
+const MAX_DRIVER_NAME = 40;
+/** Downtown Birmingham, the default start point for a new driver. */
+export const DOWNTOWN: LatLng = { lat: 33.5186, lng: -86.8104 };
 
 const DEFAULT_WEATHER: Weather = { lowF: 55, alerts: [], surge: false, simulated: false };
 
@@ -19,8 +23,23 @@ export class StoreError extends Error {
 
 const g = globalThis as unknown as { __shiptgiving?: AppState };
 
+function makeDriver(id: string, name: string, vehicle: VehicleType, start: LatLng): Driver {
+  const { size, capacity } = VEHICLES[vehicle];
+  return { id, name, vehicle, size, capacity, start, kind: "shipt" };
+}
+
+// Tomorrow's drivers for the demo: 2 school buses and a convertible.
+const SEED_DRIVERS: Driver[] = [
+  makeDriver("d-bus-1", "Bus 1", "bus", { lat: 33.5207, lng: -86.8025 }),
+  makeDriver("d-bus-2", "Bus 2", "bus", { lat: 33.5149, lng: -86.8122 }),
+  makeDriver("d-convertible", "Convertible", "compact", { lat: 33.5186, lng: -86.8104 }),
+];
+
 function fresh(): AppState {
-  return structuredClone({ partners, catalog, needs, stores: STORE_SNAPSHOT, pledges: [], weather: DEFAULT_WEATHER });
+  return structuredClone({
+    partners, catalog, needs, stores: STORE_SNAPSHOT, pledges: [], weather: DEFAULT_WEATHER,
+    drivers: SEED_DRIVERS, routes: [], unrouted: [], routeSummary: null,
+  });
 }
 
 export function getState(): AppState {
@@ -35,16 +54,6 @@ function commit(next: AppState): AppState {
 
 export function resetState(): AppState {
   return commit(fresh());
-}
-
-const round2 = (n: number) => Math.round(n * 100) / 100;
-
-// shortcut: replace with pledgeCost() from src/lib/fees.ts (mulimangila) once it is merged.
-function estimateCost(price: number, qty: number, fulfillment: Fulfillment, donorsInBatch: number): PledgeCost {
-  const items = round2(price * qty);
-  const deliveryShare = fulfillment === "volunteer" ? 0 : round2(BATCH_DELIVERY_FEE / donorsInBatch);
-  const service = fulfillment === "shipt" ? round2(items * SERVICE_RATE) : 0;
-  return { items, deliveryShare, service, total: round2(items + deliveryShare + service) };
 }
 
 const isLatLng = (p: unknown): p is LatLng =>
@@ -93,7 +102,7 @@ export function addPledge(input: NewPledge): Pledge {
     fulfillment,
     storeId,
     porch: fulfillment === "porch" ? (input.porch as LatLng) : undefined,
-    cost: estimateCost(item?.price ?? 0, qty, fulfillment, batchDonors),
+    cost: pledgeCost(item?.price ?? 0, qty, fulfillment, batchDonors),
     status: "pledged",
     createdAt: new Date().toISOString(),
   };
@@ -164,4 +173,36 @@ export function setWeather(weather: Weather): Weather {
 export function setStores(stores: Store[]): Store[] {
   if (stores.length > 0) commit({ ...getState(), stores });
   return getState().stores;
+}
+
+/** Adds one of tomorrow's drivers. Validates untrusted input; start defaults to downtown. */
+export function addDriver(name: unknown, vehicle: unknown, start?: unknown): Driver {
+  const state = getState();
+  const cleanName = typeof name === "string" ? name.trim() : "";
+  if (cleanName.length < 1 || cleanName.length > MAX_DRIVER_NAME) throw new StoreError(`Name must be 1-${MAX_DRIVER_NAME} characters`);
+  if (typeof vehicle !== "string" || !Object.hasOwn(VEHICLES, vehicle)) throw new StoreError("Invalid vehicle");
+  if (start !== undefined && !isLatLng(start)) throw new StoreError("Invalid start location");
+  const id = `d-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+  const at = start === undefined ? DOWNTOWN : { lat: (start as LatLng).lat, lng: (start as LatLng).lng };
+  const driver = makeDriver(id, cleanName, vehicle as VehicleType, at);
+  commit({ ...state, drivers: [...state.drivers, driver] });
+  return driver;
+}
+
+export function removeDriver(id: string): void {
+  const state = getState();
+  if (!state.drivers.some((d) => d.id === id)) throw new StoreError("Unknown driver", 404);
+  commit({ ...state, drivers: state.drivers.filter((d) => d.id !== id), routes: state.routes.filter((r) => r.driverId !== id) });
+}
+
+/** Saves a route plan. Pledges on a route become "batched"; batched pledges left off every route go back to "pledged". */
+export function setRoutes(routes: RoutePlan[], unrouted: string[], summary: RouteSummary | null): AppState {
+  const state = getState();
+  const onRoute = new Set(routes.flatMap((r) => r.stops.flatMap((s) => s.pledgeIds)));
+  const pledges = state.pledges.map((p): Pledge => {
+    if (p.status === "pledged" && onRoute.has(p.id)) return { ...p, status: "batched" };
+    if (p.status === "batched" && !onRoute.has(p.id)) return { ...p, status: "pledged" };
+    return p;
+  });
+  return commit({ ...state, pledges, routes, unrouted, routeSummary: summary });
 }

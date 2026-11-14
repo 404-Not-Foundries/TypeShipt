@@ -85,15 +85,44 @@ export type Stop = {
   eta?: string;
 };
 
+export type VehicleSize = "S" | "M" | "L" | "XL";
+export type VehicleType = "compact" | "sedan" | "suv" | "bus";
+
+/** Capacity in item units. Our assumptions: Shipt decodes the VIN; we mock that with a vehicle picker. */
+export const VEHICLES: Record<VehicleType, { label: string; size: VehicleSize; capacity: number }> = {
+  compact: { label: "Compact / convertible", size: "S", capacity: 10 },
+  sedan: { label: "Sedan", size: "M", capacity: 25 },
+  suv: { label: "SUV / minivan", size: "L", capacity: 50 },
+  bus: { label: "School bus", size: "XL", capacity: 150 },
+};
+
+export type Driver = {
+  id: string;
+  name: string;
+  vehicle: VehicleType;
+  size: VehicleSize;
+  capacity: number;
+  start: LatLng;
+  kind: "shipt" | "volunteer";
+};
+
 export type RoutePlan = {
-  driver: "shipt" | "volunteer";
+  driverId: string;
+  driverName: string;
+  size: VehicleSize;
+  capacity: number;
+  load: number; // items on board
   stops: Stop[];
   minutes: number;
   miles: number;
-  naiveMinutes: number;
+  naiveMinutes: number; // one separate trip per pledge
   naiveMiles: number;
+  lateStops: number; // drop-offs whose ETA falls outside the partner's receiving window
   polyline?: LatLng[];
 };
+
+/** e.g. label "2 XL routes + 1 S route". */
+export type RouteSummary = { routes: number; items: number; minutes: number; naiveMinutes: number; label: string };
 
 export type Weather = {
   lowF: number;
@@ -110,6 +139,10 @@ export type AppState = {
   needs: Need[];
   pledges: Pledge[];
   weather: Weather;
+  drivers: Driver[];
+  routes: RoutePlan[];
+  unrouted: string[]; // pledge ids that fit no vehicle
+  routeSummary: RouteSummary | null;
 };
 
 export const FULFILLMENTS: Fulfillment[] = ["shipt", "volunteer", "porch"];
