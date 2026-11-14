@@ -9,15 +9,12 @@ export const metadata: Metadata = {
   description: "What ShiptGiving does, how a pledge flows, the architecture and the code behind it.",
 };
 
-const REPO = "https://github.com/404-Not-Foundries/TypeShipt";
-
 const SECTIONS = [
   { id: "features", label: "Features" },
   { id: "flow", label: "Pledge flow" },
   { id: "architecture", label: "Architecture" },
   { id: "code", label: "Code" },
   { id: "decisions", label: "Decisions" },
-  { id: "built", label: "How we built it" },
 ];
 
 const NUMBERS = [
@@ -34,14 +31,6 @@ const DECISIONS = [
   { title: "A gift order, so zero new Shipt systems", text: "Shipt already delivers gifts to any address. A pledge is one, pre-addressed to the nonprofit with a community tag: no new order type, labor or money handling." },
   { title: "AI with a fallback", text: "Claude must answer in a JSON schema limited to real catalog ids, and anything else is dropped. No key or a failed call falls back to a keyword parser." },
   { title: "Public APIs only", text: "OSM, Open Food Facts, OSRM, NWS and ProPublica need no keys. Each call has a timeout and a fallback: snapshot, straight line, last reading, seed record." },
-];
-
-const BUILT = [
-  { title: "Shared context", text: "Every agent reads AGENTS.md and docs/context/project.md first: the spec, data contract, API and owners." },
-  { title: "Folder ownership", text: "Each teammate owns folders (rmaytr, mulimangila, Viral-W). Agents edit only their owner's files and ask for a handoff otherwise." },
-  { title: "An agent message board", text: "A pinned GitHub issue (#2) is the team channel. Agents post what merged and which contracts changed, through tools/board." },
-  { title: "Plan → build → review", text: "One branch per task, planned first, then tests, type check, lint and a production build before each small pull request." },
-  { title: "Claude Code + Codex in parallel", text: "Each agent works in its own git worktree, so features move at once. Work from one tool is reviewed with the other." },
 ];
 
 function Section({ id, title, lead, children }: { id: string; title: string; lead: string; children: React.ReactNode }) {
@@ -120,24 +109,6 @@ export default function HowItWorksPage() {
             </li>
           ))}
         </ul>
-      </Section>
-
-      <Section id="built" title="How we built it" lead="Three people and several AI coding agents, in one day, in 50+ small pull requests.">
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {BUILT.map((b) => (
-            <li key={b.title} className="rounded-2xl bg-totemeal p-5">
-              <h3 className="font-bold">{b.title}</h3>
-              <p className="mt-1 text-sm text-secondary">{b.text}</p>
-            </li>
-          ))}
-        </ul>
-        <p className="text-sm">
-          <a href={`${REPO}/issues/2`} className="inline-flex min-h-11 items-center font-semibold underline">The board (issue #2)</a>
-          <span aria-hidden="true"> · </span>
-          <a href={`${REPO}/blob/main/AGENTS.md`} className="inline-flex min-h-11 items-center font-semibold underline">AGENTS.md</a>
-          <span aria-hidden="true"> · </span>
-          <a href={`${REPO}/blob/main/docs/OVERVIEW.md`} className="inline-flex min-h-11 items-center font-semibold underline">Project overview</a>
-        </p>
       </Section>
     </div>
   );
