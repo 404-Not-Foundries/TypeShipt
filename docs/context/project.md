@@ -1,10 +1,10 @@
-# Project brief: Neighbor Cart
+# Project brief: ShiptGiving
 
 > Source of truth for every agent and teammate. If this conflicts with `AGENTS.md`, this file wins.
 > Locked 2026-11-14, 11:15 AM CT. Build window ends 2:59 PM CT.
 
 ## One sentence
-**Neighbor Cart** lets Birmingham nonprofits post what they need (an Amazon-style wishlist), and lets anyone fill a need in a few taps: Shipt delivers it as an ordinary gift order addressed to the nonprofit, a volunteer drives it, or a driver picks it up from the donor's porch. A route optimizer batches every pledge into the fewest, shortest trips.
+**ShiptGiving** lets Birmingham nonprofits post what they need (an Amazon-style wishlist), and lets anyone fill a need in a few taps: Shipt delivers it as an ordinary gift order addressed to the nonprofit, a volunteer drives it, or a driver picks it up from the donor's porch. A route optimizer batches every pledge into the fewest, shortest trips.
 
 ## The problem (Birmingham, with sources)
 - **Firehouse Ministries** shelters 215+ men every night (29,509 shelter nights in 2025). It "depends on in-kind donations" for clothing and toiletries through a static Amazon wish list, and opens its day shelter on any day under 40°F or with a heat advisory. Public money is 67–72% of its budget; its goal is 50/50 public/private. ([home](https://firehouseshelter.com/), [FAQ](https://firehouseshelter.com/who-we-are/faq/))
@@ -14,7 +14,7 @@
 - Giving in-kind today is high-friction: buy online or in a store, find the drop-off hours, drive downtown, hope it's still needed. Nonprofits get 60 of one thing and 0 of what they actually need.
 
 ## Why this works for Shipt (and costs it nothing)
-- **Shipt already does this.** It supports gift orders to an address other than your own; the recipient gets a tracking text ([help](https://help.shipt.com/how-do-i-send-a-gift-delivery)). A Neighbor Cart order is a gift order pre-addressed to a verified nonprofit, with a `community` tag. No new order type and no changes to checkout or dispatch.
+- **Shipt already does this.** It supports gift orders to an address other than your own; the recipient gets a tracking text ([help](https://help.shipt.com/how-do-i-send-a-gift-delivery)). A ShiptGiving order is a gift order pre-addressed to a verified nonprofit, with a `community` tag. No new order type and no changes to checkout or dispatch.
 - **It's revenue-positive.** Donors pay the normal item price, delivery fee and service fee. Shipt earns on every order and gains new customers (non-members can donate too).
 - **No new labor.** Shoppers do a normal delivery. Batching means more drops per trip.
 - **No money handling.** Each donor pays for their own share through Shipt's existing checkout. Shipt never holds pooled or charity money.
@@ -89,7 +89,7 @@ Coordinates come from OpenStreetMap Nominatim. Hours marked † were not publish
 - *Outliers:* the Food Bank (~5 mi, 12 min) and Lovelady (~10 mi, 20 min).
 
 The demo scenario is a cold night: 6 pledges across Firehouse, Brother Bryan, Jimmie Hale and Pathways, picked up from 2 stores and 1 porch. One optimized route versus 6 separate trips.
-**Stores:** 3 real Shipt retail-partner stores near downtown (e.g., Target, Publix, Walmart). Viraj geocodes them with Nominatim and marks them in `src/data/stores.ts`.
+**Stores:** real Birmingham grocery and pharmacy locations from OpenStreetMap: Publix Southside, three Piggly Wigglys, Target Brookwood, Walmart Montclair, two ALDIs, CVS, Walgreens, Winn-Dixie, Whole Foods. They're already in `src/lib/stores/snapshot.ts` (lead), with a live Overpass lookup at `GET /api/stores`.
 
 ## Scope
 **Must have (the demo breaks without it):**
@@ -104,16 +104,26 @@ The demo scenario is a cold night: 6 pledges across Firehouse, Brother Bryan, Ji
 
 **Out of scope:** real payments (the checkout is a mock; in production it's Shipt's own checkout), auth, a real Shipt API (Shipt's developer APIs are partner-gated, so we mock a "Send via Shipt" handoff), SMS or push, a database, multi-driver VRP with more than 2 drivers, native apps.
 
+## Public store and grocery APIs (other retailers are part of the product)
+ShiptGiving shows real stores from many retailers as pickup points, not just one chain. That matches Shipt's multi-retailer marketplace.
+| API | What we use it for | Key | Where |
+|---|---|---|---|
+| **OpenStreetMap Overpass** | Live lookup of real grocery and pharmacy stores near a partner or donor (Publix, Piggly Wiggly, Target, Walmart, ALDI, CVS, Walgreens, Winn-Dixie, Whole Foods) | none | `src/lib/stores/osm.ts`, `GET /api/stores?lat=&lng=` |
+| **OSM snapshot (via Nominatim)** | The same real locations, cached, for when Overpass is busy (it often is) | none | `src/lib/stores/snapshot.ts` |
+| **Open Food Facts** | Name, brand and photo for **food** items (it's a food database, so don't use it for socks or blankets) | none | `src/lib/stores/products.ts`, `GET /api/products?q=` |
+| **Kroger Developer API** | Optional live shelf price (`KROGER_CLIENT_ID`/`SECRET` in `.env.local`) | free account | same |
+Shipt itself has no public consumer API, so "Send via Shipt" mocks Shipt's existing gift-order checkout.
+
 ## Stack
-- **Next.js (App Router) + TypeScript + Tailwind**, created fresh during build time with `create-next-app` in `neighbor-cart/`. Add shadcn/ui components only as needed.
+- **Next.js (App Router) + TypeScript + Tailwind**, created fresh during build time with `create-next-app` in `shiptgiving/`. Add shadcn/ui components only as needed.
 - **Leaflet + react-leaflet** with OpenStreetMap tiles for maps.
 - **@anthropic-ai/sdk** (Claude) for need parsing only. `ANTHROPIC_API_KEY` goes in `.env.local`, with a keyword fallback when it's missing.
 - **OSRM public demo server** for drive times and route lines; **NWS api.weather.gov** for weather. Both are free and need no key. Send a generic `User-Agent`.
 - **State:** an in-memory store on the Next server (kept on `globalThis` so it survives hot reload). Every view polls `GET /api/state` every 2 seconds. No database.
 - **Tests:** Vitest for the routing engine and fee split only.
-- Run: `cd neighbor-cart && npm install && npm run dev`, then open http://localhost:3000.
+- Run: `cd shiptgiving && npm install && npm run dev`, then open http://localhost:3000.
 
-## Data contract (`neighbor-cart/src/lib/types.ts`; the lead owns it, so ask before changing it)
+## Data contract (`shiptgiving/src/lib/types.ts`; the lead owns it, so ask before changing it)
 ```ts
 export type LatLng = { lat: number; lng: number };
 export type Window = { days: number[]; open: string; close: string }; // days 0=Sun; "09:00"
@@ -155,21 +165,30 @@ export type Weather = { lowF: number; alerts: string[]; surge: boolean; reason?:
 export type AppState = { partners: Partner[]; stores: Store[]; catalog: CatalogItem[]; needs: Need[]; pledges: Pledge[]; weather: Weather };
 ```
 
-## API (Next route handlers under `neighbor-cart/src/app/api/`)
+## Scaffold notes (merged 11:35)
+- `useAppState()` from `@/lib/use-app-state` gives any client view the live `AppState` (polls every 2 s) plus `refresh()`.
+- Store functions in `@/lib/store`: `getState`, `addPledge`, `setPledgeStatus`, `addNeeds(partnerId, items)`, `updateNeeds(fn)`, `setWeather(w)`, `setStores(s)`, `resetState`. They throw `StoreError` with an HTTP status; use `errorResponse()` from `@/lib/http` in route handlers.
+- **Seed data:** Viraj exports `partners`, `catalog` and `needs` from `src/data/index.ts`; then the lead switches one import in `store.ts` from `@/lib/seed-stub`. Stores come from `src/lib/stores/snapshot.ts`.
+- **Fees:** `store.ts` has a temporary `estimateCost` ($9.99 batch fee ÷ donors, 5% service on Shipt orders, $0 for volunteers). Emma's `src/lib/fees.ts` should export `pledgeCost(price, qty, fulfillment, donorsInBatch): PledgeCost` with the same rules, and the lead swaps it in.
+- `POST /api/state {"reset": true}` restores the seed (demo reset).
+
+## API (Next route handlers under `shiptgiving/src/app/api/`)
 | Method and path | Body | Returns | Owner |
 |---|---|---|---|
 | `GET /api/state` | none | `AppState` | rmaytr |
 | `POST /api/pledges` | `{needId, qty, fulfillment, donorName, storeId?, porch?}` | `Pledge` (also bumps `need.qtyPledged`) | rmaytr |
 | `PATCH /api/pledges/[id]` | `{status}` | `Pledge` (`received` bumps `qtyReceived`) | rmaytr |
 | `POST /api/route-plan` | `{start: LatLng, driver, pledgeIds?}` | `RoutePlan` | rmaytr |
+| `GET /api/stores?lat=&lng=` | none | `{stores: Store[], source}` | rmaytr |
+| `GET /api/products?q=` | none | `{name, brand, image, barcode, krogerPrice?, sources}` | rmaytr |
 | `POST /api/needs` | `{partnerId, items: {itemId, title, qty, urgency}[]}` | `Need[]` | Viral-W |
 | `POST /api/parse-need` | `{partnerId, text}` | `{items: {itemId, title, qty, urgency}[]}` | Viral-W |
 | `GET /api/weather` / `POST /api/weather` | `{simulate?: "cold" \| "heat" \| null}` | `Weather` (applies the surge to Firehouse needs) | Viral-W |
 
 ## Owners
-| Area | Owner | Folders (inside `neighbor-cart/`) |
+| Area | Owner | Folders (inside `shiptgiving/`) |
 |---|---|---|
-| Scaffold, types, store, core API, routing engine, driver view, README | `rmaytr` (lead) | `src/lib/types.ts`, `src/lib/store.ts`, `src/lib/routing/`, `src/app/api/state`, `src/app/api/pledges`, `src/app/api/route-plan`, `src/app/driver/`, `src/app/layout.tsx`, `src/components/nav/`, `README.md` |
+| Scaffold, types, store, core API, store/grocery APIs, routing engine, driver view, README | `rmaytr` (lead) | `src/lib/types.ts`, `src/lib/store.ts`, `src/lib/seed-stub.ts`, `src/lib/use-app-state.ts`, `src/lib/http.ts`, `src/lib/stores/`, `src/app/api/stores`, `src/app/api/products`, `src/lib/routing/`, `src/app/api/state`, `src/app/api/pledges`, `src/app/api/route-plan`, `src/app/driver/`, `src/app/layout.tsx`, `src/components/nav/`, `README.md` |
 | Donor experience | `mulimangila` | `src/app/page.tsx`, `src/app/p/`, `src/components/donor/`, `src/lib/fees.ts` |
 | Partner portal, seed data, AI parsing, weather | `Viral-W` | `src/app/partner/`, `src/components/partner/`, `src/data/`, `src/lib/ai.ts`, `src/lib/weather.ts`, `src/app/api/needs`, `src/app/api/parse-need`, `src/app/api/weather` |
 | Shared UI primitives (`src/components/ui/`) | whoever needs it first; post on the board | |
@@ -201,7 +220,9 @@ export type AppState = { partners: Partner[]; stores: Store[]; catalog: CatalogI
 | API outage during the demo | OSRM fallback to straight-line; AI fallback to keywords; weather "simulate" toggle |
 
 ## Decisions log
-- 11:15. Chose Neighbor Cart over a Shipt dispatch integration: Shipt already supports gift orders to any address, so the integration needs no new Shipt systems, labor or money handling.
+- 11:15. Chose ShiptGiving over a Shipt dispatch integration: Shipt already supports gift orders to any address, so the integration needs no new Shipt systems, labor or money handling.
 - 11:15. No database: in-memory store plus polling is enough for a one-laptop live demo and keeps the code small.
 - 11:15. Routing runs on our own pickup-and-delivery heuristic over an OSRM matrix instead of a hosted VRP service: small n, no keys, and every line of it is explainable.
 - 11:15. The fee is shared only for delivery; items are paid per pledge. This keeps Shipt's billing unchanged.
+- 11:30. Renamed the product to **ShiptGiving**; the app folder is `shiptgiving/`.
+- 11:30. Added public retailer and grocery APIs (OSM stores, Open Food Facts, optional Kroger prices), so many real Birmingham stores appear as pickup points.
