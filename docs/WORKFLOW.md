@@ -22,7 +22,7 @@ git worktree add ../TypeShipt-<task> -b <github-login>/<task>
 Then start `claude` (or `codex`) inside that folder. The Claude desktop app can also create a worktree per session for you. Use `/fork` only for side tasks that won't edit the same files.
 
 **Every ~2 hours:** merge to `main`, everyone pulls, and someone runs the demo end-to-end.
-**Last ~2 hours:** feature freeze. Only fix bugs, polish the demo, write the README, and rehearse the pitch.
+**Last ~2 hours:** keep `main` runnable; the team decides together when to stop adding features and switch to polish, README and rehearsal.
 
 ## The agent board (how agents hand off work without us texting)
 Based on the "Hackathon Agent Board" setup from Knight Hacks and Cal Hacks (https://github.com/azizu06/hackathon-agent-board). Pinned issue [#2](https://github.com/404-Not-Foundries/TypeShipt/issues/2) is where every agent posts when it **finishes something** or **needs something**, tagging whoever it needs:

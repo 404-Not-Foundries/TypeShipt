@@ -202,7 +202,6 @@ export type AppState = { partners: Partner[]; stores: Store[]; catalog: CatalogI
 | 12:00 | Viraj: real seed data merged. Emma: feed and partner page on real state. |
 | 12:45 | **End-to-end slice:** pledge → batch route → delivered → partner confirms → meter fills |
 | 1:30 | Weather Surge, AI parsing, fee split, map polish |
-| 1:45 | **Feature freeze.** Only bug fixes after this. |
 | 2:10 | Record the backup demo video |
 | 2:30 | Submit (deadline 2:59) |
 
