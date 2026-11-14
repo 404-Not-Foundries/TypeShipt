@@ -1,9 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { POST } from "@/app/api/demo/route";
+import { register } from "@/instrumentation";
 import { loadColdNight, seedDemoPledges } from "@/lib/demo";
 import { pledgeCost } from "@/lib/fees";
 import { planRoutes } from "@/lib/routing";
-import { addPledge, getState, resetState } from "@/lib/store";
+import { addPledge, getState, resetState, setRoutes } from "@/lib/store";
 import type { Pledge } from "@/lib/types";
 import { refreshWeather } from "@/lib/weather";
 
@@ -13,7 +14,7 @@ const choices = (pledges: Pledge[]) => pledges.map((pledge) => ({
   storeId: pledge.storeId, porch: pledge.porch, cost: pledge.cost, status: pledge.status,
 }));
 
-// Keep the suite offline: the reset action asks for the live forecast, which falls back when the fetch fails.
+// Keep the suite offline: nothing here may reach the live forecast.
 vi.stubGlobal("fetch", () => Promise.reject(new Error("offline")));
 
 beforeEach(() => { resetState(); });
@@ -117,15 +118,13 @@ describe("POST /api/demo", () => {
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
   });
 
-  it("seeds and resets the shared state", async () => {
+  it("seeds the shared state, and the blank seed is still one resetState() away", async () => {
     const initialNeeds = structuredClone(getState().needs);
     const seeded = await POST(request({ action: "seed" }));
     expect(seeded.status).toBe(200);
     expect(await seeded.json()).toEqual({ created: 10 });
     expect(getState().pledges).toHaveLength(10);
-    const reset = await POST(request({ action: "reset" }));
-    expect(await reset.json()).toEqual({ ok: true });
-    expect(getState().pledges).toHaveLength(0);
+    resetState();
     expect(getState().needs).toEqual(initialNeeds);
   });
 
@@ -166,14 +165,30 @@ describe("loadColdNight", () => {
     }
   });
 
-  it("is undone by the reset action, simulated weather included", async () => {
-    await loadColdNight();
+  it("is what the reset action returns to, whatever happened since", async () => {
+    const start = choices(await loadColdNight());
+    addPledge({ needId: "n-fh-water", qty: 1, fulfillment: "shipt" });
+    const plan = planRoutes(getState(), 0);
+    setRoutes(plan.routes, plan.unrouted, plan.summary);
+    await refreshWeather("heat");
+
     const response = await POST(new Request("http://localhost/api/demo", { method: "POST", body: JSON.stringify({ action: "reset" }) }));
-    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ ok: true });
     await refreshWeather(); // what the donor feed does on load
-    expect(getState().pledges).toEqual([]);
-    expect(getState().weather.surge).toBe(false);
-    expect(getState().needs.some((need) => need.surgeReason)).toBe(false);
+    const state = getState();
+    expect(choices(state.pledges)).toEqual(start);
+    expect(state).toMatchObject({ routes: [], unrouted: [], routeSummary: null, weather: { surge: true, simulated: true } });
+    expect(state.weather.reason).toMatch(/low/i);
+    expect(state.drivers.map((driver) => driver.size)).toEqual(["XL", "XL", "S"]);
+  });
+
+  it("is the state the server starts in", async () => {
+    vi.stubEnv("NEXT_RUNTIME", "nodejs");
+    await register();
+    vi.unstubAllEnvs();
+    expect(getState().pledges).toHaveLength(13);
+    expect(getState().weather).toMatchObject({ surge: true, simulated: true });
+    expect(planRoutes(getState(), 0)).toMatchObject({ unrouted: [], summary: { label: "2 XL routes + 1 S route" } });
   });
 
   it("is available as POST /api/demo cold-night", async () => {

@@ -24,26 +24,32 @@ ShiptGiving seeds 11 real Birmingham nonprofits (shelters, the food bank, educat
 ```bash
 cd shiptgiving
 npm install
-cp .env.example .env.local   # optional: ANTHROPIC_API_KEY, Kroger keys
+cp .env.example .env.local   # optional keys, see below
 npm run dev                   # http://localhost:3000
 npm test                      # unit tests
 ```
 
-Everything works without keys: need parsing falls back to keywords, and prices fall back to catalog estimates.
+Keys are optional. `ANTHROPIC_API_KEY` goes in `shiptgiving/.env.local` and lets Claude turn a nonprofit's plain-text request into catalog items; without it (or if the call fails), parsing falls back to keyword matching. Kroger keys add live shelf prices; without them, prices are catalog estimates.
 
-**One-click demo:** open `/demo` and choose **Cold night demo**. It resets the data, turns on a simulated cold-weather surge and adds a night of pledges. Then choose **Generate routes** to get "2 XL routes + 1 S route": 308 items in 2 h 24 m, instead of 4 h 21 m if every donation were its own round trip. That is 1 h 57 m and 30 miles of driving saved. The same button is on `/impact`, and Generate routes is also on `/driver`.
+## Demo in 60 seconds
+
+1. Open `/`. The app starts on a cold night: a simulated Weather Surge, tomorrow's drivers (2 school buses and a convertible) and a night of pledges already in.
+2. Choose **Presenter** to see donor, nonprofit and driver side by side. **Cold night demo** or **Reset** brings that starting state back at any time.
+3. Choose **Generate routes**: "2 XL routes + 1 S route", 308 items in 2 h 24 m instead of 4 h 21 m as separate round trips. That saves 1 h 57 m and 30 miles of driving.
 
 ## The views
 
 | View | Path | What it does |
 |---|---|---|
 | **Home** | `/` | What ShiptGiving is, a live strip (urgent needs, items pledged, partners, weather surge) and a card for each view below. |
-| **Give** | `/give`, `/p/[id]` | Needs feed (urgent first, weather banner, filters), partner pages, and the fill-a-need sheet: quantity, the three delivery options, store picker, cost breakdown, your pledges and a written acknowledgment once the partner confirms receipt. |
-| **Nonprofits** | `/partner` | Nonprofit staff post a need in plain English ("cold front tonight, need 40 pairs of men's socks"), see incoming pledges, and confirm receipt. Includes the Weather Surge panel, accept rules, dorm kits and the confidential-address notice. |
-| **Drivers** | `/driver` | "Tomorrow's drivers" (add or remove vehicles), Generate routes, a map with one color per route, and route cards with load, ETAs, late badges and Mark picked up / Mark delivered. |
-| **Impact** | `/impact` | Items pledged and delivered, partners helped, value of goods, trips and minutes saved by routing, progress per partner, recent activity. |
+| **Give** | `/give`, `/p/[id]` | A Shipt-style feed: tonight's most urgent needs first, product cards with quick add, search and categories, and a live strip with the weather and recent pledges. Cards show which neighbors are already helping. The fill-a-need sheet covers quantity, the three delivery options, store picker and cost breakdown. Also partner pages, your pledges, and a written acknowledgment once the partner confirms receipt. |
+| **Nonprofits** | `/partner` | Nonprofit staff post a need in plain English ("cold front tonight, need 40 pairs of men's socks"), see incoming pledges, and confirm receipt. Includes the Weather Surge panel, accept rules, dorm kits, the confidential-address notice, and a verification card (EIN, 501(c)(3) status, name and city checked against IRS records). |
+| **Drivers** | `/driver` | "Tomorrow's drivers" (add or remove vehicles), Generate routes, a banner with the time and miles saved, a map with one color per route, and route cards with load, ETAs, late badges and Mark picked up / Mark delivered. |
+| **Impact** | `/impact` | Items pledged and delivered, partners helped, value of goods, trips, minutes and miles saved by routing, progress per partner, recent activity. |
+| **Shipt concept** | `/shipt`, `/shipt/order/[id]` | What ShiptGiving could look like as a section of the Shipt app: urgent needs, neighborhood stores, your community orders and order tracking. A mock; nothing is purchased or sent to Shipt. |
+| **Presenter** | `/demo` | Donor, nonprofit and driver side by side on one screen, with Cold night demo, Generate routes and Reset. |
 
-`/demo` is a presenter view that shows Give, Partner and Driver side by side with the demo controls. All views read the same state and refresh every 2 seconds, so a pledge made in one window shows up in the others.
+All views read the same state and refresh every 2 seconds, so a pledge made in one window shows up in the others.
 
 ## Architecture
 
@@ -51,18 +57,21 @@ Everything works without keys: need parsing falls back to keywords, and prices f
 - **In-memory store** (`src/lib/store.ts`), kept on `globalThis` so it survives hot reload. Every write returns a new state object. There is no database: one Node process is enough for a one-laptop demo.
 - **Polling:** `useAppState()` fetches `GET /api/state` every 2 seconds.
 - **Seed data** in `src/data/`: 11 partners, 50 catalog items, 35 needs. The 13 stores come from an OpenStreetMap snapshot.
+- **Start state:** `src/instrumentation.ts` loads the cold-night scenario when the server starts, so the app never opens empty. The demo reset returns to it.
+- **Design:** Shipt's design language, written up in [`docs/context/shipt-design.md`](../docs/context/shipt-design.md). Colors are shared tokens in `src/app/globals.css`, the font is Plus Jakarta Sans, and the theme is light only.
 - **Maps:** Leaflet with OpenStreetMap tiles.
 
 | Method and path | Purpose |
 |---|---|
-| `GET /api/state` | The whole app state. `POST {"reset": true}` restores the seed. |
+| `GET /api/state` | The whole app state. `POST {"reset": true}` restores the blank seed (no pledges). |
 | `POST /api/pledges`, `PATCH /api/pledges/[id]` | Make a pledge; move it along (`batched`, `picked_up`, `delivered`, `received`). |
 | `POST /api/needs`, `POST /api/parse-need` | Publish needs; turn plain text into catalog items. |
 | `GET /api/weather`, `POST /api/weather` | Current weather and surge; simulate cold or heat. |
 | `POST /api/drivers`, `DELETE /api/drivers/[id]` | Tomorrow's drivers. |
 | `POST /api/route-plan` | Plan routes for the open pledges and save them. |
 | `GET /api/stores`, `GET /api/products` | Nearby stores; product name, brand, photo and optional price. |
-| `POST /api/demo` | `seed`, `cold-night` or `reset`. |
+| `GET /api/shipt/orders` | Each pledge as the gift order a Shipt platform integration would send (mock). |
+| `POST /api/demo` | `seed` adds sample pledges; `cold-night` and `reset` both return to the starting cold-night state. |
 
 ## Public data and APIs
 
@@ -73,6 +82,7 @@ Everything works without keys: need parsing falls back to keywords, and prices f
 | Kroger Developer API | Live shelf prices (optional) | Free account |
 | OSRM public server | The road line drawn for each route | No |
 | National Weather Service (api.weather.gov) | Tonight's low and heat alerts, which trigger the Weather Surge | No |
+| ProPublica Nonprofit Explorer (IRS exempt-organization records) | A snapshot used to verify each partner; partners with no confirmed record stay unverified | No |
 | Claude (Anthropic API) | Turning a nonprofit's plain-text need into catalog items | Yes (keyword fallback without it) |
 
 Shipt has no public consumer API, so "Send via Shipt" is a mock of Shipt's existing gift-order checkout. No real payments happen.
@@ -83,7 +93,7 @@ The planner (`src/lib/routing/`) is greedy and small on purpose, so every decisi
 
 1. **Vehicle sizes.** Each driver has a vehicle, and the vehicle sets the route size: S compact (10 items), M sedan (25), L SUV or minivan (50), XL school bus (150). The capacities are our assumptions; the vehicle picker stands in for a VIN lookup.
 2. **What gets routed.** Open "Shipt delivers" and "Porch pickup" pledges. Volunteers drive their own.
-3. **Greedy fill, biggest vehicle first.** Pledges are grouped by drop-off partner. Each driver, largest first, takes groups in order of earliest closing time, then distance from the driver's start, loading whole pledges while they fit. Anything too big for every vehicle is reported as unrouted.
+3. **Greedy fill, biggest vehicle first.** Pledges are grouped by drop-off partner. Each driver, largest first, takes groups in order of earliest closing time, then distance from the driver's start, loading pledges while they fit. A pledge bigger than the largest vehicle is split into vehicle-sized parts that can ride with different drivers. Whatever the fleet can't carry is reported as unrouted, and the fill-a-need sheet warns a donor whose pledge is more than tomorrow's drivers can carry.
 4. **Shop, then deliver.** Each route visits all of its pickups (the chosen store, the store nearest the partner, or the donor's porch), then all of its drop-offs, so a pickup always comes before its drop-off. Stops at the same place are merged.
 5. **Ordering.** Each phase is ordered by nearest neighbor and then improved with 2-opt (reverse any stretch of the path that makes it shorter).
 6. **Times.** Drive time is straight-line distance × 1.3 at 25 mph, plus 5 minutes at every pickup and drop-off (parking, checkout, hand-off). ETAs run from a 9:00 AM start. A route's total covers the whole round trip, including the drive back to the start. A drop-off outside the partner's receiving hours is counted as late.
