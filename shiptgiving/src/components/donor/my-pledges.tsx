@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useState } from "react";
 import { amountCharged, formatUsd } from "@/lib/fees";
 import type { AppState, PledgeStatus } from "@/lib/types";
@@ -33,8 +34,11 @@ export function MyPledges({ ids, state }: { ids: string[]; state: AppState }) {
               </span>
               <span className="flex items-center gap-2">
                 <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${p.status === "received" ? "bg-express text-express" : "border border-hairline bg-white"}`}>{STATUS[p.status]}</span>
+                <Link href={`/shipt/order/${p.id}`} className="inline-flex min-h-11 items-center px-1 text-xs font-semibold text-primary underline">
+                  Track order
+                </Link>
                 {p.status === "received" && (
-                  <button type="button" onClick={() => setReceiptId(p.id)} className="text-xs font-medium text-primary underline">
+                  <button type="button" onClick={() => setReceiptId(p.id)} className="inline-flex min-h-11 items-center px-1 text-xs font-semibold text-primary underline">
                     View receipt
                   </button>
                 )}

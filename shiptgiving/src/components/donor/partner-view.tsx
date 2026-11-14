@@ -39,7 +39,7 @@ export function PartnerView() {
 
   return (
     <article className="space-y-6 text-primary">
-      <Link href="/give" className="text-sm text-primary hover:underline">← All needs</Link>
+      <Link href="/give" className="inline-flex min-h-11 items-center text-sm text-primary hover:underline">← All needs</Link>
       <PartnerFacts partner={partner} needs={needs} />
       <NeighborWall state={state} partner={partner} />
       <section aria-labelledby="open-needs" className="space-y-3">
