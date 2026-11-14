@@ -3,6 +3,8 @@
 import { useCallback, useState } from "react";
 import { useAppState } from "@/lib/use-app-state";
 import { loadWeather } from "@/components/partner/api";
+import { ConfidentialBadge, ConfidentialNotice } from "@/components/partner/confidential-badge";
+import { DormKit } from "@/components/partner/dorm-kit";
 import { IncomingBoard } from "@/components/partner/incoming-board";
 import { OpenNeeds } from "@/components/partner/open-needs";
 import { PartnerPicker } from "@/components/partner/partner-picker";
@@ -34,7 +36,10 @@ export default function PartnerPage() {
     <div className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">{partner.name}</h1>
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-2xl font-bold text-neutral-900">{partner.name}</h1>
+            <ConfidentialBadge partner={partner} />
+          </div>
           <p className="mt-1 max-w-2xl text-sm text-neutral-600">{partner.mission}</p>
         </div>
         <PartnerPicker partners={state.partners} value={partner.id} onChange={setPickedId} />
@@ -49,9 +54,11 @@ export default function PartnerPage() {
       <div className="grid gap-4 lg:grid-cols-[3fr_2fr]">
         <div className="space-y-4">
           <PostNeed key={partner.id} partner={partner} catalog={state.catalog} onPublished={afterPublish} />
+          <DormKit partner={partner} catalog={state.catalog} needs={state.needs} onPublished={afterPublish} />
           <OpenNeeds needs={needs} />
         </div>
         <div className="space-y-4">
+          <ConfidentialNotice partner={partner} />
           <SurgePanel partner={partner} weather={state.weather} needs={needs} onChanged={refresh} />
           <RulesSummary partner={partner} />
         </div>
