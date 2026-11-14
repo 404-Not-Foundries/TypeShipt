@@ -4,7 +4,7 @@ import { useState } from "react";
 import { sendJson } from "@/components/driver/format";
 
 const VIEWS = [
-  { id: "give", label: "Donor", hint: "fills a need", src: "/" },
+  { id: "give", label: "Donor", hint: "fills a need", src: "/give" },
   { id: "partner", label: "Nonprofit", hint: "posts needs, confirms receipt", src: "/partner" },
   { id: "driver", label: "Driver", hint: "runs tomorrow's routes", src: "/driver" },
 ] as const;

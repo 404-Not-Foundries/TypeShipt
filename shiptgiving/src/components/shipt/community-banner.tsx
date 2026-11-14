@@ -22,7 +22,7 @@ export function CommunityBanner({ state, query }: { state: AppState; query: stri
               <span className="font-semibold">Weather surge: </span>{state.weather.reason ?? "Weather conditions have raised local needs."}
             </p>
           )}
-          <Link href="/" className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white hover:opacity-90">Give now</Link>
+          <Link href="/give" className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white hover:opacity-90">Give now</Link>
         </div>
         <div>
           <h2 className="text-lg font-bold">Urgent needs near you</h2>
@@ -43,7 +43,7 @@ export function CommunityBanner({ state, query }: { state: AppState; query: stri
                     <p className="mt-1 text-sm text-secondary">{partner?.name ?? "Community partner"}</p>
                     <div className="mt-2 flex flex-wrap items-center justify-between gap-x-3">
                       <p className="text-sm">{need.qtyNeeded - need.qtyPledged} still needed</p>
-                      <Link href={partner ? `/p/${encodeURIComponent(partner.id)}` : "/"}
+                      <Link href={partner ? `/p/${encodeURIComponent(partner.id)}` : "/give"}
                         className="inline-flex min-h-11 items-center text-sm font-semibold underline underline-offset-4"
                         aria-label={`View ${need.title} for ${partner?.name ?? "this partner"}`}>View need</Link>
                     </div>
