@@ -54,7 +54,13 @@ export default function DriverPage() {
       )}
 
       <div className="grid gap-5 lg:grid-cols-[22rem_1fr]">
-        <DriversPanel drivers={drivers} openPledges={open} onChange={refresh} />
+        {state ? (
+          <DriversPanel drivers={drivers} openPledges={open} onChange={refresh} />
+        ) : (
+          <p role="status" className="rounded-2xl border border-hairline bg-surface-muted p-5 text-secondary">
+            Loading tomorrow&rsquo;s drivers…
+          </p>
+        )}
         <section
           aria-label="Route map"
           className="relative isolate order-first h-[20rem] overflow-hidden rounded-2xl border border-hairline bg-surface-muted lg:order-none lg:h-auto lg:min-h-[32rem]"

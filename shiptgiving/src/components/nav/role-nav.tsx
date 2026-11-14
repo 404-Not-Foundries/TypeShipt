@@ -19,17 +19,18 @@ function NavLinks({ path }: { path: string | null }) {
           <Link
             href={l.href}
             aria-current={on(l.href) ? "page" : undefined}
-            className={`inline-flex min-h-11 items-center rounded-full px-4 ${on(l.href) ? "bg-primary text-white" : "text-primary hover:bg-surface-muted"}`}
+            className={`inline-flex min-h-11 items-center rounded-full px-3 sm:px-4 ${on(l.href) ? "bg-primary text-white" : "text-primary hover:bg-surface-muted"}`}
           >
             {l.label}
           </Link>
         </li>
       ))}
-      <li>
+      {/* Hidden on phones: the split view needs a wide screen, and the home page links to it. */}
+      <li className="hidden sm:block">
         <Link
           href="/demo"
           aria-current={on("/demo") ? "page" : undefined}
-          className="inline-flex min-h-11 items-center px-3 text-xs font-normal text-secondary underline hover:text-primary"
+          className={`inline-flex min-h-11 items-center px-3 text-xs underline hover:text-primary ${on("/demo") ? "font-bold text-primary" : "font-normal text-secondary"}`}
         >
           Presenter
         </Link>

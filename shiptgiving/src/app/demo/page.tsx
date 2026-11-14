@@ -52,8 +52,11 @@ export default function DemoPage() {
   return (
     // Full-bleed: the layout caps pages at max-w-6xl, and three views need the whole laptop screen.
     <div className="relative left-1/2 w-screen -translate-x-1/2 space-y-3 px-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <h1 className="mr-auto text-xl font-bold">One need, three views</h1>
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <h1 className="text-2xl font-extrabold tracking-tight">One need, three views</h1>
+        <p role="status" className={`mr-auto text-sm ${note?.failed ? "font-semibold text-sale" : "text-secondary"}`}>
+          {note?.text}
+        </p>
         {ACTIONS.map((a) => (
           <button
             key={a.id}
@@ -68,9 +71,6 @@ export default function DemoPage() {
           </button>
         ))}
       </div>
-      <p role="status" className={`min-h-5 text-sm ${note?.failed ? "text-sale" : "text-secondary"}`}>
-        {note?.text}
-      </p>
 
       <div role="tablist" aria-label="View" className="flex gap-1 min-[1100px]:hidden">
         {VIEWS.map((v) => (
@@ -101,10 +101,10 @@ export default function DemoPage() {
               tab === v.id ? "" : "hidden"
             }`}
           >
-            <h2 id={`label-${v.id}`} className="border-b border-hairline px-4 py-2 text-sm font-bold">
-              {v.label} <span className="font-normal text-secondary">{v.hint}</span>
+            <h2 id={`label-${v.id}`} className="border-b border-hairline px-4 py-2 text-lg font-extrabold">
+              {v.label} <span className="text-sm font-normal text-secondary">{v.hint}</span>
             </h2>
-            <iframe src={v.src} title={`${v.label} view`} className="block h-[calc(100dvh-15rem)] min-h-[28rem] w-full" />
+            <iframe src={v.src} title={`${v.label} view`} className="block h-[calc(100dvh-13.5rem)] min-h-[28rem] w-full" />
           </section>
         ))}
       </div>
