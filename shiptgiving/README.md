@@ -27,8 +27,10 @@ npm install
 cp .env.example .env.local   # optional keys, see below
 npm run dev                   # http://localhost:3000
 npm test                      # unit tests
+npm run smoke                 # another terminal, with the dev server running
 ```
 
+Use `SMOKE_URL=http://localhost:3003 npm run smoke` for another port (PowerShell: `$env:SMOKE_URL="http://localhost:3003"; npm run smoke`). The check changes test data, then restores the cold-night demo.
 Keys are optional. `ANTHROPIC_API_KEY` goes in `shiptgiving/.env.local` and lets Claude turn a nonprofit's plain-text request into catalog items; without it (or if the call fails), parsing falls back to keyword matching. Kroger keys add live shelf prices; without them, prices are catalog estimates.
 
 ## Demo in 60 seconds
