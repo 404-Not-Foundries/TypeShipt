@@ -1,13 +1,23 @@
 // Owner: Viral-W. Automated nonprofit verification: no human approval step.
 // A partner is verified when all four checks pass against its IRS record:
 // EIN found, 501(c)(3) exempt, name matches (or a DBA at the same street), city + state match.
+// Church ministries with no IRS record get a neutral "religious" status instead (see VerificationStatus).
 import { verificationRecords, type IrsRecord, type VerificationRecord } from "@/data/verification";
 
 export type CheckId = "ein" | "exempt" | "name" | "city";
 export type Check = { id: CheckId; label: string; pass: boolean; detail: string };
 
+/**
+ * verified: every check passed.
+ * religious: no IRS record, but the partner is a church ministry, which the IRS doesn't require to register or file.
+ *   Shown neutrally, not as a failure. Still not `verified`.
+ * unverified: anything else.
+ */
+export type VerificationStatus = "verified" | "religious" | "unverified";
+
 export type Verification = {
   partnerId: string;
+  status: VerificationStatus;
   ein: string | null;
   verified: boolean;
   verifiedAt: string | null;
@@ -49,6 +59,24 @@ const normStreet = (s: string) =>
 
 const sameText = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase();
 
+/** Birmingham metro cities. An IRS address anywhere in the metro counts as a Birmingham-area match. */
+export const BIRMINGHAM_METRO = new Set(
+  [
+    "birmingham", "bessemer", "hoover", "homewood", "mountain brook", "vestavia hills", "irondale", "fairfield",
+    "tarrant", "center point", "trussville", "pelham", "alabaster", "leeds", "midfield", "gardendale",
+    "fultondale", "helena", "pleasant grove", "hueytown", "adamsville", "chelsea", "moody",
+  ],
+);
+
+/** "same" when the cities match, "metro" when both are in the Birmingham metro, otherwise false. */
+export function cityMatch(declared: { city: string; state: string }, irs: { city: string; state: string }): "same" | "metro" | false {
+  if (!sameText(declared.state, irs.state)) return false;
+  if (sameText(declared.city, irs.city)) return "same";
+  const a = declared.city.trim().toLowerCase();
+  const b = irs.city.trim().toLowerCase();
+  return BIRMINGHAM_METRO.has(a) && BIRMINGHAM_METRO.has(b) ? "metro" : false;
+}
+
 export function runChecks(record: VerificationRecord): Check[] {
   const { declared, irs } = record;
   if (!irs) {
@@ -65,7 +93,8 @@ export function runChecks(record: VerificationRecord): Check[] {
   const direct = namesMatch(declared.name, irs.legalName);
   const viaStreet =
     !direct && !!declared.street && !!irs.street && normStreet(declared.street) === normStreet(irs.street);
-  const cityOk = sameText(declared.city, irs.city) && sameText(declared.state, irs.state);
+  const city = cityMatch(declared, irs);
+  const cityOk = city !== false;
 
   return [
     { id: "ein", label: "EIN found in IRS records", pass: true, detail: `EIN ${formatEin(irs.ein)}` },
@@ -89,7 +118,9 @@ export function runChecks(record: VerificationRecord): Check[] {
       id: "city",
       label: "City matches",
       pass: cityOk,
-      detail: cityOk ? `${irs.city}, ${irs.state}` : `IRS lists ${irs.city}, ${irs.state}, not ${declared.city}, ${declared.state}`,
+      detail: cityOk
+        ? `${irs.city}, ${irs.state}${city === "metro" ? ` (${declared.city} metro)` : ""}`
+        : `IRS lists ${irs.city}, ${irs.state}, not ${declared.city}, ${declared.state}`,
     },
   ];
 }
@@ -97,8 +128,10 @@ export function runChecks(record: VerificationRecord): Check[] {
 export function verify(record: VerificationRecord): Verification {
   const checks = runChecks(record);
   const verified = checks.every((c) => c.pass);
+  const status: VerificationStatus = verified ? "verified" : !record.irs && record.religious ? "religious" : "unverified";
   return {
     partnerId: record.partnerId,
+    status,
     ein: record.irs?.ein ?? null,
     verified,
     verifiedAt: verified ? record.checkedAt : null,
@@ -115,6 +148,7 @@ export function getVerification(partnerId: string): Verification {
   return (
     byId.get(partnerId) ?? {
       partnerId,
+      status: "unverified",
       ein: null,
       verified: false,
       verifiedAt: null,
