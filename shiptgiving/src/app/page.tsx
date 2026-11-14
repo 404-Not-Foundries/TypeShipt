@@ -1,6 +1,6 @@
 "use client";
 // Donor needs feed. Owner: mulimangila.
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FeedSkeleton } from "@/components/donor/feed-skeleton";
 import { FillSheet } from "@/components/donor/fill-sheet";
 import { FilterChips } from "@/components/donor/filter-chips";
@@ -17,6 +17,13 @@ export default function GivePage() {
   const [category, setCategory] = useState<string | null>(null);
   const [fillingId, setFillingId] = useState<string | null>(null);
   const [myIds, addMyId] = useMyPledgeIds();
+
+  // Check the NWS forecast once on load so the Weather Surge shows even before the partner portal is opened.
+  useEffect(() => {
+    fetch("/api/weather", { cache: "no-store" })
+      .then(() => refresh())
+      .catch(() => {});
+  }, [refresh]);
 
   const categoryOf = useMemo(() => new Map(state?.catalog.map((c) => [c.id, c.category]) ?? []), [state?.catalog]);
   const visible = useMemo(() => {

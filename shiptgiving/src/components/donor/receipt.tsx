@@ -31,7 +31,7 @@ export function Receipt({ pledge, state, onClose }: Props) {
         <dl className="mt-4 space-y-2">
           <div className="flex justify-between gap-4"><dt className="text-neutral-500">Donor</dt><dd>{pledge.donorName}</dd></div>
           <div className="flex justify-between gap-4"><dt className="text-neutral-500">Items received</dt><dd className="text-right">{pledge.qty} × {item?.name ?? need?.title}</dd></div>
-          <div className="flex justify-between gap-4"><dt className="text-neutral-500">Item cost paid</dt><dd>{formatUsd(pledge.cost.items)}</dd></div>
+          <div className="flex justify-between gap-4"><dt className="text-neutral-500">Item value</dt><dd>{formatUsd(pledge.cost.items)}</dd></div>
           <div className="flex justify-between gap-4"><dt className="text-neutral-500">Pledged</dt><dd>{new Date(pledge.createdAt).toLocaleDateString()}</dd></div>
           <div className="flex justify-between gap-4"><dt className="text-neutral-500">Reference</dt><dd className="font-mono text-xs">{pledge.id}</dd></div>
         </dl>
