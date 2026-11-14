@@ -1,15 +1,9 @@
-import { addPledge, getState } from "@/lib/store";
+import { haversineMiles } from "@/lib/routing/geo";
+import { addPledge, DOWNTOWN, getState } from "@/lib/store";
 import type { Fulfillment, LatLng, Pledge } from "@/lib/types";
 
 const NAMES = ["Alex", "Jordan", "Sam", "Taylor", "Morgan", "Casey", "Riley", "Jamie"];
-const DOWNTOWN: LatLng = { lat: 33.5186, lng: -86.8104 };
 const radians = (degrees: number) => degrees * Math.PI / 180;
-
-function haversine(a: LatLng, b: LatLng): number {
-  const h = Math.sin(radians(b.lat - a.lat) / 2) ** 2
-    + Math.cos(radians(a.lat)) * Math.cos(radians(b.lat)) * Math.sin(radians(b.lng - a.lng) / 2) ** 2;
-  return 6371 * 2 * Math.asin(Math.sqrt(Math.min(1, h)));
-}
 
 function randomGenerator() {
   let seed = 404;
@@ -59,7 +53,7 @@ export function seedDemoPledges(count = 10): Pledge[] {
     if (item?.perishable || (fulfillment === "porch" && !group.partner.accepts.porchPickup)) fulfillment = "shipt";
     const location = group.partner.dropPoint?.location ?? group.partner.location;
     const nearest = state.stores.reduce<(typeof state.stores)[number] | undefined>((best, store) =>
-      !best || haversine(location, store.location) < haversine(location, best.location) ? store : best, undefined);
+      !best || haversineMiles(location, store.location) < haversineMiles(location, best.location) ? store : best, undefined);
     if (fulfillment === "shipt" && !nearest) fulfillment = "volunteer";
     const qty = Math.min(2 + Math.floor(random() * 7), remaining.get(need.id) ?? 0);
 

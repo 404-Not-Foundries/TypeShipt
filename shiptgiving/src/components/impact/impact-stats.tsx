@@ -1,22 +1,16 @@
 import { formatUsd } from "@/lib/fees";
 import type { AppState } from "@/lib/types";
 
-// Optional structural fields also accept the scaffold before the fleet contract lands.
-type ImpactState = AppState & {
-  routes?: { stops: { pledgeIds: string[] }[] }[];
-  routeSummary?: { minutes: number; naiveMinutes: number } | null;
-};
-
-export function ImpactStats({ state }: { state: ImpactState }) {
+export function ImpactStats({ state }: { state: AppState }) {
   const stats = [
-    { label: "Items pledged", value: state.pledges.reduce((sum, pledge) => sum + pledge.qty, 0).toLocaleString() },
+    { label: "Items pledged", value: state.needs.reduce((sum, need) => sum + need.qtyPledged, 0).toLocaleString() },
     { label: "Items delivered", value: state.needs.reduce((sum, need) => sum + need.qtyReceived, 0).toLocaleString() },
     { label: "Partners helped", value: new Set(state.pledges.map((pledge) => pledge.partnerId)).size.toLocaleString() },
     { label: "Donors", value: new Set(state.pledges.map((pledge) => pledge.donorName)).size.toLocaleString() },
     { label: "Value of goods", value: formatUsd(state.pledges.reduce((sum, pledge) => sum + pledge.cost.items, 0)) },
   ];
   const routes = state.routes;
-  const routed = new Set(routes?.flatMap((route) => route.stops.flatMap((stop) => stop.pledgeIds)) ?? []);
+  const routed = new Set(routes.flatMap((route) => route.stops.flatMap((stop) => stop.pledgeIds)));
   const summary = state.routeSummary;
   return (
     <section aria-label="Community impact" className="space-y-4">
@@ -29,7 +23,7 @@ export function ImpactStats({ state }: { state: ImpactState }) {
         ))}
       </dl>
       <p className="text-sm text-neutral-600">Delivered items are confirmed received by a partner. Goods value excludes delivery and service fees.</p>
-      {!!routes?.length && (
+      {routes.length > 0 && (
         <div className="rounded-2xl bg-emerald-800 p-5 text-white">
           <h2 className="text-lg font-semibold">More giving, fewer trips</h2>
           <dl className="mt-3 flex flex-wrap gap-x-10 gap-y-3">
