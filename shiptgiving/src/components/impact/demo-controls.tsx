@@ -49,7 +49,7 @@ export function DemoControls({ onRefresh }: { onRefresh: () => Promise<void> }) 
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h2 className="font-semibold">Explore a giving day</h2>
-          <p className="mt-1 text-sm text-neutral-600">Add sample pledges across open needs, or start over with a cold night: a weather surge and a night of pledges for tomorrow&apos;s drivers. Reset restores the starting state for every view.</p>
+          <p className="mt-1 text-sm text-neutral-600">The app opens on a cold night: a simulated weather surge and a night of pledges for tomorrow&apos;s drivers. Add more sample pledges, or reset every view to that starting state.</p>
         </div>
         <div className="flex shrink-0 flex-wrap gap-2">
           <button type="button" disabled={pending !== null} onClick={() => run("seed")}
