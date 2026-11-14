@@ -15,3 +15,14 @@ export function sortNeeds(needs: Need[]): Need[] {
       b.createdAt.localeCompare(a.createdAt),
   );
 }
+
+export type SortMode = "urgent" | "closest" | "filled";
+
+/** "urgent" is sortNeeds; the other modes re-rank open needs by distance or by how close they are to filled. */
+export function sortNeedsBy(needs: Need[], mode: SortMode, miles: (n: Need) => number): Need[] {
+  const base = sortNeeds(needs);
+  if (mode === "urgent") return base;
+  const key = mode === "closest" ? miles : (n: Need) => -n.qtyPledged / Math.max(1, n.qtyNeeded);
+  // Array.sort is stable, so ties keep the urgency order.
+  return base.sort((a, b) => Number(isOpen(b)) - Number(isOpen(a)) || key(a) - key(b));
+}
