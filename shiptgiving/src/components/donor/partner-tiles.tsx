@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { VerifiedBadge } from "@/components/partner/verified-badge";
 import type { Need, Partner } from "@/lib/types";
 
 const initials = (name: string) =>
@@ -24,6 +25,7 @@ export function PartnerTiles({ partners, needs }: { partners: Partner[]; needs: 
               {initials(p.name)}
             </span>
             <span className="mt-2 block truncate text-sm font-semibold">{p.name}</span>
+            <VerifiedBadge partnerId={p.id} className="mt-1" />
             <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${urgent ? "bg-express text-express" : "text-secondary"}`}>
               {urgent ? "Needs help tonight" : `${open} open ${open === 1 ? "need" : "needs"}`}
             </span>
