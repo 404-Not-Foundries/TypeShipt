@@ -29,10 +29,10 @@ export default function HomePage() {
       .catch(() => {});
   }, [refresh]);
 
-  const stats = state && [
-    { label: "urgent needs", value: state.needs.filter((n) => n.urgency === "urgent" && n.qtyPledged < n.qtyNeeded).length },
-    { label: "items pledged", value: state.needs.reduce((sum, n) => sum + n.qtyPledged, 0) },
-    { label: "nonprofit partners", value: state.partners.length },
+  const stats = [
+    { label: "urgent needs", value: state?.needs.filter((n) => n.urgency === "urgent" && n.qtyPledged < n.qtyNeeded).length },
+    { label: "items pledged", value: state?.needs.reduce((sum, n) => sum + n.qtyPledged, 0) },
+    { label: "nonprofit partners", value: state?.partners.length },
   ];
 
   return (
@@ -48,16 +48,14 @@ export default function HomePage() {
             {error}
           </p>
         )}
-        {stats && (
-          <dl aria-label="Right now in Birmingham" className="mt-6 flex flex-wrap gap-x-10 gap-y-4">
-            {stats.map((s) => (
-              <div key={s.label} className="flex flex-col-reverse">
-                <dt className="text-sm">{s.label}</dt>
-                <dd className="text-4xl font-extrabold tabular-nums">{s.value.toLocaleString()}</dd>
-              </div>
-            ))}
-          </dl>
-        )}
+        <dl aria-label="Right now in Birmingham" aria-busy={!state} className="mt-6 flex flex-wrap gap-x-10 gap-y-4">
+          {stats.map((s) => (
+            <div key={s.label} className="flex flex-col-reverse">
+              <dt className="text-sm">{s.label}</dt>
+              <dd className="text-4xl font-extrabold tabular-nums">{s.value?.toLocaleString() ?? "–"}</dd>
+            </div>
+          ))}
+        </dl>
         {state?.weather.surge && state.weather.reason && (
           <p className="mt-5 inline-flex min-h-8 items-center rounded-full bg-dark-band px-4 text-sm font-semibold text-white">
             Weather Surge: {state.weather.reason}

@@ -9,14 +9,14 @@ import { useAppState } from "@/lib/use-app-state";
 export default function ImpactPage() {
   const { state, error, refresh } = useAppState();
   return (
-    <section className="space-y-6 text-neutral-900">
+    <section className="space-y-6 text-primary">
       <header>
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">ShiptGiving impact, Birmingham</h1>
-        <p className="mt-2 max-w-2xl text-neutral-600">Every pledge moves a local nonprofit closer to what it needs. Follow the giving, from a neighbor&apos;s promise to a partner&apos;s doorstep.</p>
+        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">ShiptGiving impact, Birmingham</h1>
+        <p className="mt-2 max-w-2xl text-secondary">Every pledge moves a local nonprofit closer to what it needs. Follow the giving, from a neighbor&apos;s promise to a partner&apos;s doorstep.</p>
       </header>
-      {error && <p role="alert" className="rounded-xl bg-amber-50 p-3 text-sm text-amber-800">{error}</p>}
+      {error && <p role="alert" className="rounded-xl bg-totemeal p-3 text-sm font-semibold">{error}</p>}
       {!state ? (
-        <p role="status" className="rounded-2xl border border-neutral-200 bg-white p-6 text-neutral-600">Loading community impact…</p>
+        <p role="status" className="rounded-2xl border border-hairline bg-white p-6 text-secondary">Loading community impact…</p>
       ) : (
         <>
           <ImpactStats state={state} />
