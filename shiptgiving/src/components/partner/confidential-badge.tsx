@@ -1,4 +1,5 @@
 import type { Partner } from "@/lib/types";
+import { WARM_CARD } from "./styles";
 
 export function isConfidential(partner: Pick<Partner, "features">): boolean {
   return partner.features.includes("confidential");
@@ -23,7 +24,7 @@ export function ConfidentialBadge({ partner, className = "" }: { partner: Pick<P
   if (!isConfidential(partner)) return null;
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full border border-violet-200 bg-violet-50 px-2 py-0.5 text-xs font-medium text-violet-800 ${className}`}
+      className={`inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-0.5 text-xs font-semibold text-white ${className}`}
       title="This partner's real address is never shown to donors or drivers."
     >
       <LockIcon />
@@ -38,19 +39,19 @@ export function ConfidentialNotice({ partner }: { partner: Pick<Partner, "featur
   return (
     <section
       aria-label="Confidential address"
-      className="rounded-xl border border-violet-200 bg-violet-50 p-4 text-sm text-violet-950"
+      className={`${WARM_CARD} text-sm text-primary`}
     >
-      <h3 className="flex items-center gap-1.5 font-semibold">
+      <h3 className="flex items-center gap-1.5 text-base font-bold">
         <LockIcon />
         Your address stays private
       </h3>
-      <p className="mt-1 text-violet-900">
+      <p className="mt-1 text-secondary">
         Donors and drivers never see where you are. Every delivery goes to your public drop point, and your team
         brings it the rest of the way.
       </p>
       <p className="mt-2">
-        <span className="text-violet-700">Drop point: </span>
-        <span className="font-medium">{publicAddress(partner)}</span>
+        <span className="text-secondary">Drop point: </span>
+        <span className="font-semibold">{publicAddress(partner)}</span>
       </p>
     </section>
   );

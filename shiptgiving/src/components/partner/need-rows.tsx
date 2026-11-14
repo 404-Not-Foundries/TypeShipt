@@ -1,10 +1,10 @@
 import type { CatalogItem, Urgency } from "@/lib/types";
 import type { DraftItem } from "./api";
+import { FIELD } from "./styles";
 
 export type Row = DraftItem & { key: string };
 
 const URGENCIES: Urgency[] = ["normal", "high", "urgent"];
-const FIELD = "rounded-lg border border-neutral-300 bg-white px-2 py-1.5 text-sm text-neutral-900";
 
 type Props = {
   rows: Row[];
@@ -26,7 +26,7 @@ export function NeedRows({ rows, catalog, onChange }: Props) {
       {rows.map((row, i) => {
         const item = catalog.find((c) => c.id === row.itemId);
         return (
-          <li key={row.key} className="grid grid-cols-2 gap-2 rounded-lg bg-neutral-50 p-2 sm:grid-cols-[1.2fr_1.5fr_5rem_6.5rem_auto]">
+          <li key={row.key} className="grid grid-cols-2 gap-2 rounded-xl bg-surface-muted p-2 sm:grid-cols-[1.2fr_1.5fr_5rem_6.5rem_auto]">
             <select
               aria-label={`Catalog item for row ${i + 1}`}
               value={row.itemId}
@@ -71,7 +71,7 @@ export function NeedRows({ rows, catalog, onChange }: Props) {
             <button
               type="button"
               onClick={() => onChange(rows.filter((r) => r.key !== row.key))}
-              className="rounded-lg px-2 py-1.5 text-sm text-red-700 hover:bg-red-50"
+              className="min-h-11 rounded-full px-3 text-sm font-semibold text-primary underline hover:bg-white"
             >
               Remove
             </button>

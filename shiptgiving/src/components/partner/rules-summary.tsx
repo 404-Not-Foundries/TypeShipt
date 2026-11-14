@@ -1,6 +1,7 @@
 import type { Feature, Partner } from "@/lib/types";
 import { ConfidentialBadge, publicAddress } from "./confidential-badge";
 import { formatWindow } from "./format";
+import { CARD, HEADING, PILL_MUTED } from "./styles";
 
 const FEATURE_LABELS: Record<Feature, string> = {
   weatherSurge: "Weather Surge",
@@ -20,26 +21,26 @@ export function RulesSummary({ partner }: { partner: Partner }) {
   ];
 
   return (
-    <section className="rounded-xl border border-black/10 bg-white p-4" aria-labelledby="rules-heading">
-      <h2 id="rules-heading" className="text-lg font-semibold text-neutral-900">
+    <section className={CARD} aria-labelledby="rules-heading">
+      <h2 id="rules-heading" className={HEADING}>
         Receiving and rules
       </h2>
 
       <dl className="mt-3 space-y-3 text-sm">
         <div>
-          <dt className="font-medium text-neutral-500">Deliver to</dt>
-          <dd className="text-neutral-900">
+          <dt className="font-medium text-secondary">Deliver to</dt>
+          <dd className="text-primary">
             {publicAddress(partner)}
             <ConfidentialBadge partner={partner} className="ml-2" />
           </dd>
         </div>
 
         <div>
-          <dt className="font-medium text-neutral-500">Receiving windows</dt>
-          <dd className="text-neutral-900">
+          <dt className="font-medium text-secondary">Receiving windows</dt>
+          <dd className="text-primary">
             {partner.receiving.length === 0 ? "None set" : partner.receiving.map(formatWindow).join(" · ")}
             {assumed && (
-              <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-900">
+              <span className={`ml-2 ${PILL_MUTED}`}>
                 Demo assumption: call to confirm
               </span>
             )}
@@ -47,16 +48,16 @@ export function RulesSummary({ partner }: { partner: Partner }) {
         </div>
 
         <div>
-          <dt className="font-medium text-neutral-500">Accept rules</dt>
+          <dt className="font-medium text-secondary">Accept rules</dt>
           <dd>
             <ul className="mt-1 flex flex-wrap gap-1.5">
               {rules.map((r) => (
-                <li key={r} className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs text-neutral-800">
+                <li key={r} className={PILL_MUTED}>
                   {r}
                 </li>
               ))}
               {accepts.refuses.map((r) => (
-                <li key={r} className="rounded-full bg-red-50 px-2.5 py-0.5 text-xs text-red-800">
+                <li key={r} className="inline-flex items-center rounded-full border border-hairline bg-white px-2.5 py-0.5 text-xs font-medium text-primary">
                   Refuses: {r}
                 </li>
               ))}
@@ -66,11 +67,11 @@ export function RulesSummary({ partner }: { partner: Partner }) {
 
         {partner.features.length > 0 && (
           <div>
-            <dt className="font-medium text-neutral-500">Modules</dt>
+            <dt className="font-medium text-secondary">Modules</dt>
             <dd>
               <ul className="mt-1 flex flex-wrap gap-1.5">
                 {partner.features.map((f) => (
-                  <li key={f} className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs text-emerald-900">
+                  <li key={f} className="inline-flex items-center rounded-full bg-hero-sage px-2.5 py-0.5 text-xs font-semibold text-primary">
                     {FEATURE_LABELS[f]}
                   </li>
                 ))}
