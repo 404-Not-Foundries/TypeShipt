@@ -1,18 +1,19 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useSyncExternalStore } from "react";
 
 const LINKS = [
   { href: "/", label: "Give" },
   { href: "/partner", label: "Partner" },
   { href: "/driver", label: "Driver" },
   { href: "/impact", label: "Impact" },
+  { href: "/demo", label: "Demo" },
 ];
 
 function NavLinks({ path }: { path: string | null }) {
   return (
-    <ul className="flex gap-1 text-sm font-semibold">
+    <ul className="flex flex-wrap gap-1 text-sm font-semibold">
       {LINKS.map((l) => {
         const active =
           path !== null && (l.href === "/" ? path === "/" || path.startsWith("/p/") : path.startsWith(l.href));
@@ -36,7 +37,12 @@ function ActiveNavLinks() {
   return <NavLinks path={usePathname()} />;
 }
 
+const noSubscription = () => () => {};
+
 export function RoleNav() {
+  // Inside the /demo split view each page is an iframe; the presenter's nav is enough.
+  const embedded = useSyncExternalStore(noSubscription, () => window.self !== window.top, () => false);
+  if (embedded) return null;
   return (
     <header className="sticky top-0 z-[1000] border-b border-hairline bg-white">
       <nav
