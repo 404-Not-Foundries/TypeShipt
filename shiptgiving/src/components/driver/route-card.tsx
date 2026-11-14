@@ -42,7 +42,7 @@ export function RouteCard({ route, color, pledges, onChange }: Props) {
   return (
     <article
       aria-labelledby={`route-${route.driverId}`}
-      className="overflow-hidden rounded-2xl border border-black/10 bg-white text-neutral-900"
+      className="overflow-hidden rounded-2xl border border-hairline bg-white"
       style={{ borderTop: `6px solid ${color}` }}
     >
       <header className="flex items-center gap-3 p-4 pb-2">
@@ -51,16 +51,16 @@ export function RouteCard({ route, color, pledges, onChange }: Props) {
           <h3 id={`route-${route.driverId}`} className="truncate font-bold">
             {route.driverName}
           </h3>
-          <p className="text-xs text-neutral-600">
+          <p className="text-xs text-secondary">
             {route.stops.filter((s) => s.kind !== "start").length} stops, {formatMinutes(route.minutes)},{" "}
             {route.miles.toFixed(1)} mi
-            {route.lateStops > 0 ? `, ${route.lateStops} late` : ""}
+            {route.lateStops > 0 && <span className="font-semibold text-sale">, {route.lateStops} late</span>}
           </p>
         </div>
       </header>
 
       <div className="px-4">
-        <div className="flex justify-between text-xs text-neutral-600">
+        <div className="flex justify-between text-xs text-secondary">
           <span>Load</span>
           <span>
             {route.load} of {route.capacity} items
@@ -72,13 +72,13 @@ export function RouteCard({ route, color, pledges, onChange }: Props) {
           aria-valuemin={0}
           aria-valuemax={route.capacity}
           aria-valuenow={route.load}
-          className="mt-1 h-2 overflow-hidden rounded-full bg-neutral-100"
+          className="mt-1 h-2 overflow-hidden rounded-full bg-surface-muted"
         >
           <div className="h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
         </div>
       </div>
 
-      <ol className="mt-3 divide-y divide-black/5 border-t border-black/5">
+      <ol className="mt-3 divide-y divide-hairline border-t border-hairline">
         {route.stops.map((s, i) => (
           <li key={s.id} className="flex gap-3 px-4 py-2.5">
             <span
@@ -95,27 +95,35 @@ export function RouteCard({ route, color, pledges, onChange }: Props) {
                 {s.kind === "pickup" ? "Pick up at " : s.kind === "dropoff" ? "Drop off at " : ""}
                 {s.label}
               </p>
-              <p className="text-xs text-neutral-600">
-                {s.eta ? `ETA ${formatEta(s.eta)}` : ""}
-                {s.window ? `${s.eta ? ", " : ""}receiving ${s.window.open}–${s.window.close}` : ""}
-                {s.pledgeIds.length > 0 ? `${s.eta || s.window ? ", " : ""}${s.pledgeIds.length} ${s.pledgeIds.length === 1 ? "pledge" : "pledges"}` : ""}
+              <p className="mt-0.5 text-xs text-secondary">
+                {[
+                  s.window && `Receiving ${s.window.open}–${s.window.close}`,
+                  s.pledgeIds.length > 0 && `${s.pledgeIds.length} ${s.pledgeIds.length === 1 ? "pledge" : "pledges"}`,
+                ]
+                  .filter(Boolean)
+                  .join(", ")}
               </p>
             </div>
-            {isLate(s) && (
-              <span className="self-start rounded-md bg-red-100 px-1.5 py-0.5 text-xs font-semibold text-red-800">
-                Late
+            {s.eta && (
+              <span
+                className={`self-start rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap ${
+                  isLate(s) ? "bg-sale text-white" : "bg-express text-express"
+                }`}
+              >
+                {isLate(s) ? "Late, " : ""}
+                {formatEta(s.eta)}
               </span>
             )}
           </li>
         ))}
       </ol>
 
-      <div className="grid grid-cols-2 gap-2 border-t border-black/5 p-4">
+      <div className="grid grid-cols-2 gap-2 border-t border-hairline p-4">
         <button
           type="button"
           onClick={() => mark("picked_up")}
           disabled={busy || !canPickUp}
-          className="rounded-lg border border-black/15 px-3 py-2.5 text-sm font-medium hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-emerald-700 disabled:opacity-40"
+          className="min-h-11 rounded-full border border-primary bg-white px-4 text-sm font-semibold text-primary hover:bg-surface-muted disabled:opacity-40"
         >
           {canPickUp ? "Mark picked up" : "Picked up"}
         </button>
@@ -123,12 +131,12 @@ export function RouteCard({ route, color, pledges, onChange }: Props) {
           type="button"
           onClick={() => mark("delivered")}
           disabled={busy || !canDeliver}
-          className="rounded-lg bg-neutral-900 px-3 py-2.5 text-sm font-medium text-white hover:bg-neutral-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:opacity-40"
+          className="min-h-11 rounded-full bg-primary px-4 text-sm font-semibold text-white hover:bg-black disabled:opacity-40"
         >
           {canDeliver ? "Mark delivered" : "Delivered"}
         </button>
         {error && (
-          <p role="alert" className="col-span-2 text-sm text-red-700">
+          <p role="alert" className="col-span-2 text-sm font-semibold">
             {error}
           </p>
         )}

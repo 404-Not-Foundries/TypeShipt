@@ -44,7 +44,7 @@ export function RoleNav() {
   const embedded = useSyncExternalStore(noSubscription, () => window.self !== window.top, () => false);
   if (embedded) return null;
   return (
-    <header className="sticky top-0 z-[1000] border-b border-hairline bg-white">
+    <header className="z-[1000] border-b border-hairline bg-white sm:sticky sm:top-0">
       <nav
         className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2"
         aria-label="Main"

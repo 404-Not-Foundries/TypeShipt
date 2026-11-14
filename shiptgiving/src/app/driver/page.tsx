@@ -22,22 +22,22 @@ export default function DriverPage() {
   return (
     <div className="space-y-5">
       <header>
-        <h1 className="text-2xl font-bold sm:text-3xl">Tomorrow&rsquo;s routes</h1>
-        <p className="mt-1 max-w-prose opacity-70">
+        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Tomorrow&rsquo;s routes</h1>
+        <p className="mt-1 max-w-prose text-secondary">
           Tell us who&rsquo;s driving and what they drive. Each vehicle gets one route sized to what it can carry.
         </p>
       </header>
 
       {error && (
-        <p role="alert" className="rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
+        <p role="alert" className="rounded-xl bg-surface-muted p-3 text-sm font-semibold">
           {error}
         </p>
       )}
 
       {state && pledges.length === 0 && (
-        <p className="rounded-lg border border-dashed border-black/20 bg-white p-4 text-sm text-neutral-900">
+        <p className="rounded-2xl bg-totemeal p-4 text-sm">
           No pledges yet. Load demo pledges from{" "}
-          <Link href="/impact" className="font-medium text-emerald-800 underline">
+          <Link href="/impact" className="font-semibold underline">
             Impact
           </Link>
           , or pledge an item on the Give page.
@@ -47,7 +47,7 @@ export default function DriverPage() {
       {state?.routeSummary && routes.length > 0 && <RouteSummaryBanner summary={state.routeSummary} />}
 
       {unrouted > 0 && (
-        <p role="status" className="rounded-lg bg-amber-100 p-3 text-sm font-medium text-amber-900">
+        <p role="status" className="rounded-xl bg-totemeal p-3 text-sm font-semibold">
           {unrouted} {unrouted === 1 ? "pledge doesn't" : "pledges don't"} fit tomorrow&rsquo;s vehicles. Add a driver
           or a bigger vehicle, then generate routes again.
         </p>
@@ -57,7 +57,7 @@ export default function DriverPage() {
         <DriversPanel drivers={drivers} openPledges={open} onChange={refresh} />
         <section
           aria-label="Route map"
-          className="relative isolate h-[22rem] overflow-hidden rounded-2xl border border-black/10 bg-white text-neutral-900 lg:h-auto lg:min-h-[32rem]"
+          className="relative isolate order-first h-[20rem] overflow-hidden rounded-2xl border border-hairline bg-surface-muted lg:order-none lg:h-auto lg:min-h-[32rem]"
         >
           <div className="absolute inset-0">
             <RouteMap routes={routes} />
@@ -67,7 +67,7 @@ export default function DriverPage() {
 
       {routes.length > 0 ? (
         <section aria-labelledby="routes-heading">
-          <h2 id="routes-heading" className="text-lg font-bold">
+          <h2 id="routes-heading" className="text-2xl font-bold">
             Routes
           </h2>
           <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -78,7 +78,7 @@ export default function DriverPage() {
         </section>
       ) : (
         state && (
-          <p className="text-sm opacity-70">
+          <p className="text-sm text-secondary">
             No routes yet. Add tomorrow&rsquo;s drivers, then choose Generate routes.
           </p>
         )
