@@ -1,5 +1,7 @@
 # ShiptGiving: project overview
 
+**Live demo:** https://shiptgiving.vercel.app · **Code:** [`shiptgiving/`](../shiptgiving)
+
 Built at SHIPT Hacks 2026 in Birmingham, AL by team 404 Not Foundries (`rmaytr`, `mulimangila`, `Viral-W`).
 The app is in [`shiptgiving/`](../shiptgiving/). The same story, with diagrams, is in the app at **`/how-it-works`**.
 
@@ -13,7 +15,7 @@ Birmingham nonprofits post what they need, like a wishlist. Anyone can fill a ne
 
 Pledges are then batched into routes for tomorrow's drivers, sized to the vehicles they drive and timed to each nonprofit's receiving hours.
 
-Why it matters: Firehouse Ministries shelters 215+ men a night and collects clothing and toiletries through a static wish list. About 146,000 Birmingham residents live in food deserts. Giving goods today means buying, finding drop-off hours, driving downtown and hoping it is still needed. Sources are in [`docs/context/project.md`](context/project.md).
+Why it matters: Firehouse Ministries shelters 215+ men a night and collects clothing and toiletries through a static wish list. About 146,000 Birmingham residents live in food deserts. Giving goods today means buying, finding drop-off hours, driving downtown and hoping it is still needed.
 
 ## Features
 
@@ -90,7 +92,6 @@ flowchart LR
 | `components/partner/` | Post a need, incoming board, surge panel, verification, dorm kits | Viral-W |
 | `components/driver/`, `components/impact/`, `components/shipt/`, `components/nav/` | Driver view, Impact, Shipt concept, header | rmaytr |
 
-Each teammate's code is explained in [`docs/explain/rmaytr.md`](explain/rmaytr.md), [`docs/explain/mulimangila.md`](explain/mulimangila.md) and [`docs/explain/Viral-W.md`](explain/Viral-W.md).
 
 ## How routing works
 
@@ -144,11 +145,3 @@ Vitest, 14 files, 111 tests (`npm test`, all passing at the time of writing):
 | `components/partner/confidential.test.tsx`, `dorm-kit-data.test.ts` | Confidential addresses never rendered; dorm kit lines |
 | `components/donor/community.test.ts`, `components/driver/format.test.ts` | Helper counts; driver formatting and late flags |
 
-## How we built it
-
-- **Shared context.** Every agent reads [`AGENTS.md`](../AGENTS.md) and [`docs/context/project.md`](context/project.md) first: the same spec, data contract and rules.
-- **Folder ownership.** Each teammate owns a set of folders (listed in `AGENTS.md`). Agents edit only their owner's files and ask for a handoff otherwise.
-- **An agent message board.** A pinned GitHub issue ([#2](https://github.com/404-Not-Foundries/TypeShipt/issues/2)) is the team channel. Agents post what merged and which contracts changed, through [`tools/board`](../tools/board).
-- **Plan, build, review.** Each task is planned first, built on its own branch, checked with tests, type check, lint and a production build, reviewed, and merged as a small pull request.
-- **Claude Code and Codex in parallel,** each agent in its own git worktree, so several features moved at once without touching the same files. Work from one tool was reviewed with the other.
-- **People decide.** The team lead assigns work and settles conflicts.

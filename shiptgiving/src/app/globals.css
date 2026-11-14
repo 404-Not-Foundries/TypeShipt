@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Shipt design tokens: docs/context/shipt-design.md, Part 2. Light only (no dark mode, on purpose). */
+/* Shipt design tokens (colors, type, radii). Light only (no dark mode, on purpose). */
 :root {
   --bg-primary: #ffffff;
   --bg-totemeal: #f7f4ef;

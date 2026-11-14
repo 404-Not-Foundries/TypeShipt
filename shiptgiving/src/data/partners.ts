@@ -1,6 +1,6 @@
 import type { Partner, Window } from "@/lib/types";
 
-// Real Birmingham nonprofits. Coordinates from OpenStreetMap Nominatim (see docs/context/project.md).
+// Real Birmingham nonprofits. Coordinates from OpenStreetMap Nominatim.
 // Windows with assumed: true were not published by the partner; the UI should say "call to confirm".
 
 const DAILY = [0, 1, 2, 3, 4, 5, 6];

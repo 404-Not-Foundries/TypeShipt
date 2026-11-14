@@ -8,7 +8,7 @@ Birmingham nonprofits post what they need, like a wishlist. Anyone can fill a ne
 
 Pledges are then batched into routes for tomorrow's drivers, sized to the vehicles they actually drive and timed to each nonprofit's receiving hours.
 
-Built at SHIPT Hacks 2026 ("Build a Better Birmingham") by team 404 Not Foundries. The full spec is in [`docs/context/project.md`](../docs/context/project.md). For a one-page overview see [`docs/OVERVIEW.md`](../docs/OVERVIEW.md); the in-app walkthrough is at `/how-it-works`.
+Built at SHIPT Hacks 2026 ("Build a Better Birmingham") by team 404 Not Foundries. For a one-page overview see [`docs/OVERVIEW.md`](../docs/OVERVIEW.md); the in-app walkthrough is at `/how-it-works`.
 
 ## The problem in Birmingham
 
@@ -60,7 +60,7 @@ All views read the same state and refresh every 2 seconds, so a pledge made in o
 - **Polling:** `useAppState()` fetches `GET /api/state` every 2 seconds.
 - **Seed data** in `src/data/`: 11 partners, 50 catalog items, 35 needs. The 13 stores come from an OpenStreetMap snapshot.
 - **Start state:** `src/instrumentation.ts` loads the cold-night scenario when the server starts, so the app never opens empty. The demo reset returns to it.
-- **Design:** Shipt's design language, written up in [`docs/context/shipt-design.md`](../docs/context/shipt-design.md). Colors are shared tokens in `src/app/globals.css`, the font is Plus Jakarta Sans, and the theme is light only.
+- **Design:** Shipt's design language (white and near-black canvas, warm "Totemeal" cream, mint delivery pills, Target red for urgency, Plus Jakarta Sans). Colors are shared tokens in `src/app/globals.css`, the font is Plus Jakarta Sans, and the theme is light only.
 - **Maps:** Leaflet with OpenStreetMap tiles.
 
 | Method and path | Purpose |
@@ -104,16 +104,6 @@ The planner (`src/lib/routing/`) is greedy and small on purpose, so every decisi
 
 Known limits: stop time is a flat 5 minutes however much is loaded, the baseline assumes a store order starts where our driver starts, and a partner closed on the planning day is checked against the hours of its next open day.
 
-## How we built it
-
-Three people and several AI coding agents built this in one day.
-
-- **Shared context.** Every agent reads [`AGENTS.md`](../AGENTS.md) and [`docs/context/project.md`](../docs/context/project.md) first, so they all work from the same spec, data contract and rules.
-- **Folder ownership.** Each teammate owns a set of folders, listed in `AGENTS.md`. Agents edit only their owner's files and ask for a handoff otherwise.
-- **An agent message board.** A pinned GitHub issue ([#2](https://github.com/404-Not-Foundries/TypeShipt/issues/2)) is the team channel. Agents post what they merged and which contracts changed, and read each other's posts through [`tools/board`](../tools/board). The routing contract, for example, was posted there for the driver view to build against.
-- **Plan, build, review.** Work is planned before coding, built on one branch per task, checked with tests, type check, lint and a production build, reviewed, and merged in small pull requests.
-- **Claude Code and Codex in parallel.** Each agent works in its own git worktree, so several features move at once without touching the same files. Work from one tool is reviewed with the other: the demo scenario and impact page were built by Codex and reviewed by Claude.
-- **People decide.** The team lead assigns work and settles conflicts; agents don't reassign each other.
 
 ## Image credits
 
