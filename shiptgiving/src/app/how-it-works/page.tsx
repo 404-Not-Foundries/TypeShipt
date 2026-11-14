@@ -31,6 +31,8 @@ const DECISIONS = [
   { title: "A gift order, so zero new Shipt systems", text: "Shipt already delivers gifts to any address. A pledge is one, pre-addressed to the nonprofit with a community tag: no new order type, labor or money handling." },
   { title: "AI with a fallback", text: "Claude must answer in a JSON schema limited to real catalog ids, and anything else is dropped. No key or a failed call falls back to a keyword parser." },
   { title: "Public APIs only", text: "OSM, Open Food Facts, OSRM, NWS and ProPublica need no keys. Each call has a timeout and a fallback: snapshot, straight line, last reading, seed record." },
+  { title: "Live on Vercel, deployed by hand", text: "Deployed with the Vercel CLI, not on every merge, so the live demo can't change mid-presentation. Each instance starts in the cold-night demo state." },
+  { title: "Checked before every demo", text: "121 unit tests (routing, fees, store, AI parse, weather, verification), plus npm run smoke: the whole flow against a running server, from posting a need to confirming receipt." },
 ];
 
 function Section({ id, title, lead, children }: { id: string; title: string; lead: string; children: React.ReactNode }) {

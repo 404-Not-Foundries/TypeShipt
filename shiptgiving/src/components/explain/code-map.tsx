@@ -36,6 +36,7 @@ const TREE: Folder[] = [
       { name: "routing/", owner: "rmaytr", text: "assign.ts (who carries what), order.ts (stop order), geo.ts" },
       { name: "stores/", owner: "rmaytr", text: "OSM Overpass + snapshot, Open Food Facts, Kroger" },
       { name: "shipt-platform.ts, demo.ts", owner: "rmaytr", text: "Pledge → gift order; the cold-night scenario" },
+      { name: "item-images.ts", owner: "rmaytr", text: "Freely licensed photo for every catalog item; a test checks none is missing" },
       { name: "fees.ts", owner: "mulimangila", text: "pledgeCost, amount charged, volunteer mileage" },
       { name: "ai.ts, weather.ts", owner: "Viral-W", text: "Claude + keyword parser; NWS and the surge rule" },
     ],
@@ -47,7 +48,8 @@ const TREE: Folder[] = [
       { name: "donor/", owner: "mulimangila", text: "Feed, need cards, fill-a-need sheet, receipt, fill it together" },
       { name: "partner/", owner: "Viral-W", text: "Post a need, incoming board, surge panel, verification" },
       { name: "driver/, impact/, shipt/, nav/", owner: "rmaytr", text: "Fleet panel, map, route cards, impact, Shipt concept, header" },
-      { name: "explain/", owner: "rmaytr", text: "This page: diagrams, code map, excerpts" },
+      { name: "explain/", owner: "rmaytr", text: "This page: diagrams, code map, excerpts, the App | How it works toggle" },
+      { name: "ui/", owner: "rmaytr", text: "Shared page header" },
     ],
   },
   {

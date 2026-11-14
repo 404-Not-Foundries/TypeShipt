@@ -1,8 +1,10 @@
 // Tiny line icons for /how-it-works. Owner: rmaytr. Decorative: the text next to each one carries the meaning.
 
-export type IconName = "gift" | "chat" | "snow" | "route" | "chart" | "bag" | "panels" | "post" | "spark" | "box" | "truck" | "check" | "receipt";
+export type IconName = "gift" | "chat" | "snow" | "route" | "chart" | "bag" | "panels" | "post" | "spark" | "box" | "truck" | "check" | "receipt" | "shield" | "people";
 
 const PATHS: Record<IconName, string[]> = {
+  shield: ["M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z", "M9 12l2 2 4-4"],
+  people: ["M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6z", "M3 20a6 6 0 0 1 12 0", "M16 11a2.5 2.5 0 1 0 0-5", "M17 15.2a5 5 0 0 1 4 4.8"],
   gift: ["M4 11h16v9H4z", "M3 7h18v4H3z", "M12 7v13", "M12 7c-2-4-6-3-5 0", "M12 7c2-4 6-3 5 0"],
   chat: ["M4 5h16v11H9l-5 4z", "M8 9h8", "M8 12h5"],
   snow: ["M12 3v18", "M4.2 7.5l15.6 9", "M4.2 16.5l15.6-9", "M10 4.5l2 1.5 2-1.5", "M10 19.5l2-1.5 2 1.5"],
