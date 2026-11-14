@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { POST } from "@/app/api/demo/route";
-import { seedDemoPledges } from "@/lib/demo";
+import { loadColdNight, seedDemoPledges } from "@/lib/demo";
 import { pledgeCost } from "@/lib/fees";
+import { planRoutes } from "@/lib/routing";
 import { addPledge, getState, resetState } from "@/lib/store";
 import type { Pledge } from "@/lib/types";
 
@@ -131,5 +132,38 @@ describe("POST /api/demo", () => {
 
   it("rejects malformed JSON", async () => {
     expect((await POST(new Request("http://localhost/api/demo", { method: "POST", body: "{" }))).status).toBe(400);
+  });
+});
+
+describe("loadColdNight", () => {
+  it("starts fresh with the cold surge on and the seeded drivers", async () => {
+    addPledge({ needId: "n-fh-water", qty: 1, fulfillment: "shipt" });
+    const created = await loadColdNight();
+    const state = getState();
+    expect(state.pledges).toEqual(created);
+    expect(created.length).toBeGreaterThanOrEqual(10);
+    expect(new Set(created.map((pledge) => pledge.fulfillment))).toEqual(new Set(["shipt", "porch", "volunteer"]));
+    expect(state.weather).toMatchObject({ surge: true, simulated: true });
+    expect(state.needs.find((need) => need.id === "n-fh-socks")?.surgeReason).toBeTruthy();
+    expect(state.drivers.map((driver) => driver.size)).toEqual(["XL", "XL", "S"]);
+  });
+
+  it("routes every driver-carried pledge: 2 XL routes + 1 S route, on time, on any day of the week", async () => {
+    const created = await loadColdNight();
+    const carried = created.filter((pledge) => pledge.fulfillment !== "volunteer");
+    for (let day = 0; day < 7; day++) {
+      const plan = planRoutes(getState(), day);
+      expect(plan.unrouted).toEqual([]);
+      expect(plan.summary.label).toBe("2 XL routes + 1 S route");
+      expect(plan.summary.items).toBe(carried.reduce((sum, pledge) => sum + pledge.qty, 0));
+      expect(plan.routes.every((route) => route.lateStops === 0 && route.load <= route.capacity)).toBe(true);
+      expect(plan.summary.minutes).toBeLessThan(plan.summary.naiveMinutes * 0.75);
+    }
+  });
+
+  it("is available as POST /api/demo cold-night", async () => {
+    const response = await POST(new Request("http://localhost/api/demo", { method: "POST", body: JSON.stringify({ action: "cold-night" }) }));
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ created: getState().pledges.length });
   });
 });

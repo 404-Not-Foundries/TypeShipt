@@ -1,6 +1,7 @@
 import { haversineMiles } from "@/lib/routing/geo";
-import { addPledge, DOWNTOWN, getState } from "@/lib/store";
+import { addPledge, DOWNTOWN, getState, resetState } from "@/lib/store";
 import type { Fulfillment, LatLng, Pledge } from "@/lib/types";
+import { refreshWeather } from "@/lib/weather";
 
 const NAMES = ["Alex", "Jordan", "Sam", "Taylor", "Morgan", "Casey", "Riley", "Jamie"];
 const radians = (degrees: number) => degrees * Math.PI / 180;
@@ -75,4 +76,31 @@ export function seedDemoPledges(count = 10): Pledge[] {
     }
   }
   return created;
+}
+
+type ScenarioPledge = { needId: string; qty: number; fulfillment: Fulfillment; donorName: string; porch?: LatLng };
+
+// A cold snap is forecast, so neighbors and local groups answer the Weather Surge overnight.
+// Sized for tomorrow's seeded drivers: the driver-routed items fill 2 school buses and spill into the convertible.
+const COLD_NIGHT: ScenarioPledge[] = [
+  { needId: "n-fh-socks", qty: 40, fulfillment: "shipt", donorName: "Homewood neighbors" },
+  { needId: "n-fh-blankets", qty: 20, fulfillment: "shipt", donorName: "Crestwood book club" },
+  { needId: "n-fh-warmers", qty: 30, fulfillment: "shipt", donorName: "Southside run club" },
+  { needId: "n-fh-deodorant", qty: 6, fulfillment: "volunteer", donorName: "Maya" },
+  { needId: "n-jh-hats", qty: 25, fulfillment: "porch", donorName: "Avondale knitting circle", porch: { lat: 33.5245, lng: -86.7735 } },
+  { needId: "n-jh-gloves", qty: 35, fulfillment: "shipt", donorName: "Forest Park PTA" },
+  { needId: "n-jh-blankets", qty: 8, fulfillment: "shipt", donorName: "Glen Iris choir" },
+  { needId: "n-bb-razors", qty: 12, fulfillment: "shipt", donorName: "Five Points coworkers" },
+  { needId: "n-bb-coffee", qty: 4, fulfillment: "shipt", donorName: "Jordan" },
+  { needId: "n-pw-pajamas", qty: 18, fulfillment: "shipt", donorName: "Lakeview parents" },
+  { needId: "n-pw-diapers", qty: 9, fulfillment: "porch", donorName: "Riley", porch: { lat: 33.5105, lng: -86.7905 } },
+  { needId: "n-fb-peanut-butter", qty: 62, fulfillment: "shipt", donorName: "Highland Park neighbors" },
+  { needId: "n-fb-vegetables", qty: 45, fulfillment: "shipt", donorName: "Norwood garden club" },
+];
+
+/** One-click demo: fresh state (seeded drivers included), a simulated cold-weather surge, and a night of pledges. */
+export async function loadColdNight(): Promise<Pledge[]> {
+  resetState();
+  await refreshWeather("cold");
+  return COLD_NIGHT.map((pledge) => addPledge(pledge));
 }
