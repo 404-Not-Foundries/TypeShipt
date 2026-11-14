@@ -18,7 +18,6 @@ async function coldNight(): Promise<string> {
 
 async function reset(): Promise<string> {
   await sendJson("/api/demo", "POST", { action: "reset" });
-  await sendJson("/api/weather", "POST", { simulate: null }); // the reset keeps the simulated weather otherwise
   return "Reset to the starting state.";
 }
 

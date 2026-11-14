@@ -36,7 +36,15 @@ export default function RouteMap({ routes }: { routes: RoutePlan[] }) {
   );
 
   return (
-    <MapContainer center={BIRMINGHAM} zoom={12} scrollWheelZoom={false} className="h-full w-full">
+    <MapContainer
+      center={BIRMINGHAM}
+      zoom={12}
+      scrollWheelZoom={false}
+      // On phones a one-finger drag scrolls the page and pinch zooms, so the small +/- buttons go.
+      dragging={!L.Browser.mobile}
+      zoomControl={!L.Browser.mobile}
+      className="h-full w-full"
+    >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

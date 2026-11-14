@@ -1,5 +1,6 @@
 /** One color per route, in route order. Picked to stay distinct on the OSM base map. */
-export const ROUTE_COLORS = ["#0f766e", "#c2410c", "#4338ca", "#be185d", "#0369a1", "#a16207"];
+// No reds: red is reserved for late stops.
+export const ROUTE_COLORS = ["#0b6e3b", "#1d4ed8", "#7c3aed", "#b45309", "#0e7490", "#4b5563"];
 
 export function routeColor(index: number): string {
   return ROUTE_COLORS[index % ROUTE_COLORS.length];
