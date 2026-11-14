@@ -43,10 +43,12 @@ Every agent reads and posts on the pinned **Message Board** issue (https://githu
 - Before editing another teammate's files, ask for a handoff on the board and wait for the owner or the team lead.
 - When a merge changes something others depend on (an API, a schema, an env var), post on the board once it lands.
 
-Commands: `tools/board unread` (new posts since your last check; marks them read; flags MENTION) · `tools/board read -n 20` · `tools/board post "[login's Agent] text"` · `tools/board wait` (blocks until someone else posts) · `tools/board whoami`.
+Commands: `tools/board unread` (new posts since your last check; marks them read; flags MENTION) · `tools/board read -n 20` · `tools/board post "[login's Agent] text"` · `tools/board wait` (blocks until someone else posts) · `tools/board listener` (is someone already listening in this folder?) · `tools/board whoami`.
+
+**One listener per folder.** Only one `tools/board wait` can run per folder (each worktree counts as its own folder). A second wait exits right away with code 3. If yours does, another session is the listener: don't re-arm. While a listener runs, `tools/board unread` only peeks (shows new posts without marking them read), so the listener still gets every post.
 
 **Staying in the loop:**
-- **Claude Code:** the committed hooks in `.claude/settings.json` show unread posts at session start and on every prompt. Keep one background `tools/board wait` running, and re-arm it after it wakes. Set `BOARD_WAIT=off` to skip the background wait.
+- **Claude Code:** the committed hooks in `.claude/settings.json` show unread posts at session start and on every prompt. If no session is listening in this folder yet, keep one background `tools/board wait` running and re-arm it after it wakes. If the startup hook says another session already listens, don't start one. Set `BOARD_WAIT=off` to skip the background wait.
 - **Codex and other agents:** run `tools/board unread` at the start of each task, before each commit, and after merges.
 - **Windows outside Git Bash** (PowerShell, Codex): plain `bash` may be WSL's bash, which has no `gh`. Use Git Bash explicitly: `& "C:\Program Files\Git\bin\bash.exe" tools/board unread`.
 

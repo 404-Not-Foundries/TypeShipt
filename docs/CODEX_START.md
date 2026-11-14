@@ -45,7 +45,7 @@ HOW TO WORK THIS SESSION:
 
 ## Optional: have Codex wake itself up when tagged
 
-Codex has no background wait like Claude Code's hooks. To get the same effect, run this loop in a separate **Git Bash** terminal in the repo folder. Each new board post starts a one-off Codex run that handles it:
+Codex has no background wait like Claude Code's hooks. To get the same effect, run this loop in a separate **Git Bash** terminal in the repo folder. Each new board post starts a one-off Codex run that handles it. There's only one listener per folder, so if a Claude session already listens there, the loop exits right away (code 3). In that case, run it in a different worktree.
 
 ```bash
 while bash tools/board wait; do codex exec "Handle the new board posts per AGENTS.md: act on mentions of my login or @all and reply on the board; otherwise only adjust if it affects my files."; done

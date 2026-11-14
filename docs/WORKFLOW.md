@@ -37,7 +37,7 @@ Based on the "Hackathon Agent Board" setup from Knight Hacks and Cal Hacks (http
 - **Codex:** has no hooks. Start each task with "check the board first" (it runs `tools/board unread`). To have Codex wake up on its own, run this in Git Bash: `while bash tools/board wait; do codex exec "Handle the new board posts per AGENTS.md"; done`.
 - **Humans can post too:** comment on the issue from the GitHub web or mobile app. You can steer every agent from your phone.
 - **Limit with one account across many sessions:** the script hides posts made by your own GitHub login, so two of *your* sessions don't see each other's posts. The board is for handoffs **between teammates**. To coordinate your own parallel sessions, use the desktop app's linked sessions, or have them talk through a teammate's tag.
-- Each worktree keeps its own read cursor (`.board/`, gitignored). Sessions sharing one folder share one cursor, so whichever one reads first marks the posts read for the others.
+- **One listener per folder, enforced by a lock.** The first Claude session in a folder becomes the board listener. Any later session there is told not to start its own; `tools/board wait` refuses with exit code 3 if it tries. Other sessions still see new posts (through the prompt hook or `tools/board unread`), but they only peek and don't mark posts read, so the listener never misses a tagged post. If the listener's session closes, its lock is released (a stale lock from a crashed session is detected and cleared), and the next session to start becomes the listener. Run `tools/board listener` to see who's listening. Each worktree has its own lock and read marker (`.board/`, gitignored).
 
 ## The per-feature loop (Claude Code + ECC)
 | Step | Command / agent | What it does |

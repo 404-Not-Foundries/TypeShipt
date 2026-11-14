@@ -122,9 +122,30 @@ render() {
   done
 }
 
-# Emit unread comments by others, advance cursor. Returns 0 and prints nothing if none. 1 on fetch failure.
+# One listener (tools/board wait) per folder: .board/ is per worktree, so the lock is too.
+# The lock dir holds the listener's PID; a dead PID means a stale lock (e.g. the session was killed).
+LOCK_DIR="$STATE_DIR/listener.lock"
+listener_pid() { # prints the live listener's PID; non-zero if there is none
+  local pid
+  pid="$(cat "$LOCK_DIR/pid" 2>/dev/null)" || return 1
+  case "$pid" in ''|*[!0-9]*) return 1 ;; esac
+  kill -0 "$pid" 2>/dev/null && echo "$pid"
+}
+acquire_listener() {
+  mkdir -p "$STATE_DIR"
+  if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+    listener_pid >/dev/null && return 1
+    rm -rf "$LOCK_DIR"
+    mkdir "$LOCK_DIR" 2>/dev/null || return 1
+  fi
+  echo "$$" > "$LOCK_DIR/pid"
+  trap 'rm -rf "$LOCK_DIR"' EXIT
+  trap 'exit 130' INT TERM
+}
+
+# Emit unread comments by others, advance cursor (unless $1=peek). Returns 0 and prints nothing if none. 1 on fetch failure.
 do_unread() {
-  local all login cur cid cts new maxrow
+  local mode="${1:-}" all login cur cid cts new maxrow
   login="$(me)" || return 1
   cur="$(get_cursor)"; cid="${cur%% *}"; cts="${cur#* }"
   if [ -z "$cur" ] || [ "$cid" = "$cts" ]; then
@@ -140,8 +161,9 @@ do_unread() {
   new="$(printf '%s\n' "$new" | awk -F'\t' -v me="$login" 'NF && tolower($2) != tolower(me)')"
   if [ -n "$new" ]; then
     printf '%s\n' "$new" | render "$login"
+    [ "$mode" = peek ] && echo "(not marked read: the listener in this folder handles these)" >&2
   fi
-  set_cursor "$(printf '%s' "$maxrow" | cut -f1)" "$(printf '%s' "$maxrow" | cut -f3)"
+  [ "$mode" = peek ] || set_cursor "$(printf '%s' "$maxrow" | cut -f1)" "$(printf '%s' "$maxrow" | cut -f3)"
   return 0
 }
 
@@ -174,7 +196,15 @@ cmd_read() {
 }
 
 cmd_unread() {
-  do_unread || { echo "board: could not reach GitHub (cursor unchanged)" >&2; exit 1; }
+  # While a listener runs here, only peek so it still receives every post.
+  local mode=""
+  listener_pid >/dev/null && mode=peek
+  do_unread "$mode" || { echo "board: could not reach GitHub (cursor unchanged)" >&2; exit 1; }
+}
+
+cmd_listener() {
+  local pid
+  if pid="$(listener_pid)"; then echo "listener running in this folder (pid $pid)"; else echo "no listener in this folder"; return 1; fi
 }
 
 cmd_wait() {
@@ -187,6 +217,10 @@ cmd_wait() {
     esac
   done
   case "$interval$timeout" in *[!0-9]*|'') die "wait: --interval/--timeout need whole seconds" ;; esac
+  if ! acquire_listener; then
+    echo "board: another listener is already running in this folder (pid $(listener_pid)). Not starting a second one; do not re-arm." >&2
+    exit 3
+  fi
   start="$(date +%s)"
   while :; do
     # transient gh errors: ignore and retry next tick
@@ -198,7 +232,7 @@ cmd_wait() {
       echo "board: wait timed out after ${timeout}s" >&2
       exit 124
     fi
-    sleep "$interval"
+    sleep "$interval" & wait $!  # backgrounded so a kill releases the lock right away
   done
 }
 
@@ -207,14 +241,18 @@ case "${1:-help}" in
   read) shift; cmd_read "$@" ;;
   unread) shift; cmd_unread ;;
   wait) shift; cmd_wait "$@" ;;
+  listener) shift; cmd_listener ;;
   whoami) me || die "gh not authenticated" ;;
   *)
     cat <<USAGE
 tools/board post <text>        post a comment (or pipe text on stdin); must start with [<human>'s <agent>]
 tools/board read [-n N]        show the last N comments (default 10)
 tools/board unread             show comments by others since your last check, then mark read
+                               (only peeks, without marking read, while a listener runs in this folder)
 tools/board wait [--interval S] [--timeout S]
                                block until someone else posts; print it; exit 0 (124 on timeout)
+                               one listener per folder: exits 3 if another wait already runs here
+tools/board listener           is a listener running in this folder? (exit 0 yes, 1 no)
 tools/board whoami             your GitHub login
 Env: BOARD_ISSUE (default 2), BOARD_REPO, BOARD_LOGIN
 USAGE
