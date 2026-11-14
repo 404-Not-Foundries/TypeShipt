@@ -113,16 +113,24 @@ export type RoutePlan = {
   capacity: number;
   load: number; // items on board
   stops: Stop[];
-  minutes: number;
+  minutes: number; // the whole round trip: driving back to the start included, plus stop time
   miles: number;
-  naiveMinutes: number; // one separate trip per pledge
+  naiveMinutes: number; // baseline: each donation as its own round trip, the way in-kind donations work today
   naiveMiles: number;
   lateStops: number; // drop-offs whose ETA falls outside the partner's receiving window
   polyline?: LatLng[];
 };
 
-/** e.g. label "2 XL routes + 1 S route". */
-export type RouteSummary = { routes: number; items: number; minutes: number; naiveMinutes: number; label: string };
+/** Totals across all routes. label is e.g. "2 XL routes + 1 S route". */
+export type RouteSummary = {
+  routes: number;
+  items: number;
+  minutes: number;
+  miles: number;
+  naiveMinutes: number;
+  naiveMiles: number;
+  label: string;
+};
 
 export type Weather = {
   lowF: number;

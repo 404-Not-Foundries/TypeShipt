@@ -31,7 +31,7 @@ npm test                      # unit tests
 
 Everything works without keys: need parsing falls back to keywords, and prices fall back to catalog estimates.
 
-**One-click demo:** open `/demo` and choose **Cold night demo**. It resets the data, turns on a simulated cold-weather surge and adds a night of pledges. Then choose **Generate routes** to get "2 XL routes + 1 S route": 308 items in 1 h 10 m of driving, instead of 1 h 47 m as separate trips. The same button is on `/impact`, and Generate routes is also on `/driver`.
+**One-click demo:** open `/demo` and choose **Cold night demo**. It resets the data, turns on a simulated cold-weather surge and adds a night of pledges. Then choose **Generate routes** to get "2 XL routes + 1 S route": 308 items in 2 h 24 m, instead of 4 h 21 m if every donation were its own round trip. That is 1 h 57 m and 30 miles of driving saved. The same button is on `/impact`, and Generate routes is also on `/driver`.
 
 ## The views
 
@@ -85,11 +85,11 @@ The planner (`src/lib/routing/`) is greedy and small on purpose, so every decisi
 3. **Greedy fill, biggest vehicle first.** Pledges are grouped by drop-off partner. Each driver, largest first, takes groups in order of earliest closing time, then distance from the driver's start, loading whole pledges while they fit. Anything too big for every vehicle is reported as unrouted.
 4. **Shop, then deliver.** Each route visits all of its pickups (the chosen store, the store nearest the partner, or the donor's porch), then all of its drop-offs, so a pickup always comes before its drop-off. Stops at the same place are merged.
 5. **Ordering.** Each phase is ordered by nearest neighbor and then improved with 2-opt (reverse any stretch of the path that makes it shorter).
-6. **Times.** Drive time is straight-line distance × 1.3 at 25 mph, with ETAs from a 9:00 AM start. A drop-off outside the partner's receiving hours is counted as late.
-7. **Baseline.** Every route is compared with one separate trip per pledge (start → pickup → drop-off). That is the "instead of … as separate trips" number.
+6. **Times.** Drive time is straight-line distance × 1.3 at 25 mph, plus 5 minutes at every pickup and drop-off (parking, checkout, hand-off). ETAs run from a 9:00 AM start. A route's total covers the whole round trip, including the drive back to the start. A drop-off outside the partner's receiving hours is counted as late.
+7. **Baseline.** Baseline = each donation as its own round trip, the way in-kind donations work today. A store order is start → store → nonprofit → back; a porch donor drives home → nonprofit → home. It uses the same distance model and the same 5 minutes per stop, so the saving comes from sharing trips and merging stops. Routes report minutes and miles against it.
 8. **Confidential partners** are routed to their public drop point. A confidential partner with no drop point is never routed.
 
-Known limits: ETAs don't include time spent at a stop, and a partner closed on the planning day is checked against the hours of its next open day.
+Known limits: stop time is a flat 5 minutes however much is loaded, the baseline assumes a store order starts where our driver starts, and a partner closed on the planning day is checked against the hours of its next open day.
 
 ## How we built it
 

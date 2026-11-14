@@ -161,7 +161,8 @@ describe("loadColdNight", () => {
       expect(plan.summary.label).toBe("2 XL routes + 1 S route");
       expect(plan.summary.items).toBe(carried.reduce((sum, pledge) => sum + pledge.qty, 0));
       expect(plan.routes.every((route) => route.lateStops === 0 && route.load <= route.capacity)).toBe(true);
-      expect(plan.summary.minutes).toBeLessThan(plan.summary.naiveMinutes * 0.75);
+      expect(plan.summary.minutes).toBeLessThan(plan.summary.naiveMinutes * 0.6);
+      expect(plan.summary.miles).toBeLessThan(plan.summary.naiveMiles * 0.6);
     }
   });
 
