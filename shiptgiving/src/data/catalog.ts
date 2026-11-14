@@ -76,6 +76,7 @@ export const catalog: CatalogItem[] = [
   item("headphones", "Wired classroom headphones", "School & tech", 12.99),
   item("usb-c-charger", "USB-C charger and cable", "School & tech", 14.99),
   item("notebooks", "Spiral notebooks, 6-pack", "School & tech", 6.99),
+  item("chromebook", "Chromebook 11.6\" (new, sealed)", "School & tech", 179.0),
   // Dorm
   item("dorm-kit", "Dorm move-in kit (sheets, towels, hamper, desk lamp)", "Dorm", 89.99),
   item("towel-set", "Bath towel set", "Dorm", 15.99),
