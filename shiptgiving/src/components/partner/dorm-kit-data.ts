@@ -18,13 +18,16 @@ const KIT_SLOTS: KitSlot[] = [
   { label: "Snacks", qty: 2, match: [/snack|granola|breakfast bar/i, /\bbars\b/i, /ramen|mac/i] },
 ];
 
+/** A ready-made move-in bundle is the whole kit, never one line of it. */
+const BUNDLE = /move-in kit/i;
+
 /** Maps the kit onto whatever the catalog offers. Slots with no matching item are left out; an item is used once. */
 export function resolveDormKit(catalog: CatalogItem[]): KitLine[] {
   const used = new Set<string>();
   const lines: KitLine[] = [];
   for (const slot of KIT_SLOTS) {
     const item = slot.match
-      .map((re) => catalog.find((c) => !used.has(c.id) && re.test(`${c.id} ${c.name} ${c.category}`)))
+      .map((re) => catalog.find((c) => !used.has(c.id) && !BUNDLE.test(c.name) && re.test(`${c.id} ${c.name} ${c.category}`)))
       .find(Boolean);
     if (!item) continue;
     used.add(item.id);
