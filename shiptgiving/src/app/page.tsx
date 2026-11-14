@@ -17,6 +17,7 @@ const MORE = [
   { href: "/impact", title: "Impact", text: "What the city has given so far." },
   { href: "/shipt", title: "Inside the Shipt app", text: "A concept of ShiptGiving as a Shipt section." },
   { href: "/demo", title: "Presenter view", text: "The demo script with every view side by side." },
+  { href: "/how-it-works", title: "How it works", text: "The idea, architecture and code, in a minute." },
 ];
 
 // The whole card is the link target; the heading stays the accessible name.
@@ -120,7 +121,7 @@ export default function HomePage() {
         ))}
       </ol>
 
-      <ul className="grid gap-3 sm:grid-cols-3">
+      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {MORE.map((m) => (
           <li key={m.href} className="relative rounded-2xl bg-totemeal p-4 hover:bg-surface-muted">
             <h2 className="font-bold">
