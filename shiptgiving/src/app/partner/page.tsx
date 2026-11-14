@@ -39,11 +39,11 @@ export default function PartnerPage() {
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-3xl font-extrabold leading-tight text-primary">{partner.name}</h1>
+            <h1 className="text-[28px] font-extrabold leading-[1.15] tracking-tight sm:text-4xl text-primary">{partner.name}</h1>
             <VerifiedBadge partnerId={partner.id} />
             <ConfidentialBadge partner={partner} />
           </div>
-          <p className="mt-2 max-w-2xl text-sm text-secondary">{partner.mission}</p>
+          <p className="mt-1.5 max-w-prose text-secondary">{partner.mission}</p>
         </div>
         <PartnerPicker partners={state.partners} value={partner.id} onChange={setPickedId} />
       </header>

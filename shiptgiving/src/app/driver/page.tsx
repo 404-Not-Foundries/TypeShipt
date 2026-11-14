@@ -6,6 +6,7 @@ import { routeColor } from "@/components/driver/format";
 import { RouteCard } from "@/components/driver/route-card";
 import { RouteMap } from "@/components/driver/route-map-loader";
 import { RouteSummaryBanner } from "@/components/driver/route-summary";
+import { PageHeader } from "@/components/ui/page-header";
 import { useAppState } from "@/lib/use-app-state";
 
 export default function DriverPage() {
@@ -21,12 +22,10 @@ export default function DriverPage() {
 
   return (
     <div className="space-y-5">
-      <header>
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Tomorrow&rsquo;s routes</h1>
-        <p className="mt-1 max-w-prose text-secondary">
-          Tell us who&rsquo;s driving and what they drive. Each vehicle gets one route sized to what it can carry.
-        </p>
-      </header>
+      <PageHeader
+        title="Tomorrow’s routes"
+        sub="Tell us who’s driving and what they drive. Each vehicle gets one route sized to what it can carry."
+      />
 
       {error && (
         <p role="alert" className="rounded-xl bg-surface-muted p-3 text-sm font-semibold">
