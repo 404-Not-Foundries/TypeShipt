@@ -1,5 +1,5 @@
 // Static snapshot of freely licensed item photos, resolved once (not at runtime). See README "Image credits".
-// Each photo was picked by eye; items with no suitable photo are left out and fall back to the category art.
+// Each photo was picked by eye. item-images.test.ts fails if a catalog item has no entry here.
 export type ItemImage = { url: string; credit: string };
 export const ITEM_IMAGES: Record<string, ItemImage> = {
   "socks-mens": { url: "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/Hand_knitted_socks.jpg/500px-Hand_knitted_socks.jpg", credit: "Peterdownunder, CC BY-SA 4.0, Wikimedia Commons" },
@@ -44,4 +44,12 @@ export const ITEM_IMAGES: Record<string, ItemImage> = {
   "laundry-detergent": { url: "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b5/Laundry_detergent_pods.jpg/500px-Laundry_detergent_pods.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail", credit: "ajcespedes, CC0, Wikimedia Commons" },
   "dorm-kit": { url: "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/45/Endicott_College_Stoneridge_Hall_empty_dorm_room.jpg/500px-Endicott_College_Stoneridge_Hall_empty_dorm_room.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail", credit: "Sdkb, CC BY-SA 4.0, Wikimedia Commons" },
   "chromebook": { url: "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/FMV_Chromebook_14F.jpg/500px-FMV_Chromebook_14F.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail", credit: "Mr.ちゅらさん, CC BY-SA 4.0, Wikimedia Commons" },
+  "underwear-mens": { url: "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Boxers_Brief_1.jpg/500px-Boxers_Brief_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail", credit: "Luis2492, CC BY-SA 4.0, Wikimedia Commons" },
+  "gloves": { url: "https://upload.wikimedia.org/wikipedia/commons/8/82/Skiglove.png", credit: "LilliKoopa, CC BY-SA 3.0, Wikimedia Commons" },
+  "thermal-set": { url: "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/85/Pedek_wool_underwear_%28sweater%29.jpg/500px-Pedek_wool_underwear_%28sweater%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail", credit: "Bevaringstenestene / Museumssenteret i H, CC BY-SA 4.0, Wikimedia Commons" },
+  "canned-chicken": { url: "https://images.openfoodfacts.org/images/products/001/111/089/1471/front_en.14.400.jpg", credit: "Open Food Facts contributors, CC BY-SA 3.0" },
+  "cereal": { url: "https://images.openfoodfacts.org/images/products/001/600/027/5263/front_en.77.400.jpg", credit: "Open Food Facts contributors, CC BY-SA 3.0" },
+  "diapers": { url: "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3a/Swim_diaper_%281335216873%29.jpg/500px-Swim_diaper_%281335216873%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail", credit: "Elizabeth from Lansing, MI, USA, CC BY 2.0, Wikimedia Commons" },
+  "kids-pajamas": { url: "https://live.staticflickr.com/65535/49088293568_391ff599c2.jpg", credit: "Shopping Guide 7, CC0, Flickr" },
+  "apron": { url: "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/Hanging_aprons.jpg/500px-Hanging_aprons.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail", credit: "ChimaBee, CC BY-SA 4.0, Wikimedia Commons" },
 };

@@ -117,4 +117,4 @@ Three people and several AI coding agents built this in one day.
 
 ## Image credits
 
-Item photos on the need cards are freely licensed (CC0, public domain, CC BY or CC BY-SA) and come from Wikimedia Commons, Flickr (via Openverse) and Open Food Facts. They were resolved once into a static snapshot, `src/lib/item-images.ts`, which lists the author and licence of every photo; the same list is on the Give page under "Photo credits". The photos illustrate the kind of item and are not the exact products. Items without a photo fall back to the category line art.
+Item photos on the need cards are freely licensed (CC0, public domain, CC BY or CC BY-SA) and come from Wikimedia Commons, Flickr (via Openverse) and Open Food Facts. They were resolved once into a static snapshot, `src/lib/item-images.ts`, which lists the author and licence of every photo; the same list is on the Give page under "Photo credits". The photos illustrate the kind of item and are not the exact products. If a photo fails to load, the card falls back to the category line art.
