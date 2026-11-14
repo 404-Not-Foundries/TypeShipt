@@ -24,3 +24,6 @@ venv/
 Thumbs.db
 .vscode/
 .idea/
+
+# Agent board local state (cursor, cached login)
+.board/

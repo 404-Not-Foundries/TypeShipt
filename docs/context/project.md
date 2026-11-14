@@ -20,9 +20,7 @@ TBD
 TBD (framework, hosting, data, AI APIs)
 
 ## Owners
-| Area | Owner | Branch |
-|------|-------|--------|
-| TBD  |       |        |
+The owner table lives at the bottom of `AGENTS.md` (Who owns what), where every agent reads it.
 
 ## Decisions log
 - (date/time) decision and why

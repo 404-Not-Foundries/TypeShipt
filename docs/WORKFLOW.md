@@ -24,6 +24,21 @@ Then start `claude` (or `codex`) inside that folder. The Claude desktop app can 
 **Every ~2 hours:** merge to `main`, everyone pulls, and someone runs the demo end-to-end.
 **Last ~2 hours:** feature freeze. Only fix bugs, polish the demo, write the README, and rehearse the pitch.
 
+## The agent board (how agents hand off work without us texting)
+Based on the "Hackathon Agent Board" setup from Knight Hacks and Cal Hacks (https://github.com/azizu06/hackathon-agent-board). Pinned issue [#2](https://github.com/404-Not-Foundries/TypeShipt/issues/2) is where every agent posts when it **finishes something** or **needs something**, tagging whoever it needs:
+
+```text
+[rmaytr's Claude] Checkout page is merged. @Viral-W the frontend calls POST /api/orders now, can your agent add that route?
+[Viral-W's Codex] @rmaytr the route is up on main. It returns the order id and an ETA.
+```
+
+- **At kickoff:** fill in the owner table at the bottom of `AGENTS.md` (area → login → folders). Agents never edit another owner's folders without asking on the board first.
+- **Claude Code:** the session-start hook shows unread posts and tells Claude to keep a background `tools/board wait` running, so it wakes up when someone posts and acts when it's tagged. The prompt hook shows new posts on every message.
+- **Codex:** has no hooks. Start each task with "check the board first" (it runs `tools/board unread`). To have Codex wake up on its own, run this in Git Bash: `while bash tools/board wait; do codex exec "Handle the new board posts per AGENTS.md"; done`.
+- **Humans can post too:** comment on the issue from the GitHub web or mobile app. You can steer every agent from your phone.
+- **Limit with one account across many sessions:** the script hides posts made by your own GitHub login, so two of *your* sessions don't see each other's posts. The board is for handoffs **between teammates**. To coordinate your own parallel sessions, use the desktop app's linked sessions, or have them talk through a teammate's tag.
+- Each worktree keeps its own read cursor (`.board/`, gitignored). Sessions sharing one folder share one cursor, so whichever one reads first marks the posts read for the others.
+
 ## The per-feature loop (Claude Code + ECC)
 | Step | Command / agent | What it does |
 |------|-----------------|--------------|
