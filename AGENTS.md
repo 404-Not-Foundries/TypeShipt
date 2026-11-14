@@ -2,7 +2,7 @@
 
 Shared instructions for every AI agent on this repo (Codex reads this file directly; Claude Code imports it via `CLAUDE.md`).
 
-**Status:** pre-hackathon. The project topic is not chosen yet. When it is, `docs/context/project.md` is the source of truth.
+**Status:** building **Neighbor Cart** (locked 11:15 AM, 2026-11-14). `docs/context/project.md` is the source of truth: idea, data contract, API, owners, timeline. The app lives in `neighbor-cart/`.
 
 ## Read before planning anything
 - `docs/context/project.md`: what we are building, scope, stack, demo plan, who owns what.
@@ -31,7 +31,7 @@ Three UAB students. GitHub: `rmaytr`, `mulimangila`, `Viral-W`.
 - If something in this file conflicts with `docs/context/project.md`, the project file wins.
 
 ## Stack
-TBD on hackathon day. Record it in `docs/context/project.md`.
+Next.js (App Router) + TypeScript + Tailwind in `neighbor-cart/`, Leaflet maps, Claude for need parsing, OSRM + NWS public APIs, in-memory store + polling. Details in `docs/context/project.md`.
 
 ## The board (pinned GitHub issue #2)
 Every agent reads and posts on the pinned **Message Board** issue (https://github.com/404-Not-Foundries/TypeShipt/issues/2) through `tools/board`. It needs only `bash` and `gh` (logged in). Issue #2 is the script's default, so you don't need to set `BOARD_ISSUE`.
@@ -60,4 +60,6 @@ Fill this in at kickoff so every agent knows whose files are whose.
 
 | Area | Owner (GitHub login) | Folders |
 |---|---|---|
-| TBD | | |
+| Lead: scaffold, types, store, core API, routing engine, driver view, README | `rmaytr` | `neighbor-cart/src/lib/{types,store}.ts`, `neighbor-cart/src/lib/routing/`, `neighbor-cart/src/app/api/{state,pledges,route-plan}/`, `neighbor-cart/src/app/driver/`, `neighbor-cart/src/app/layout.tsx`, `neighbor-cart/src/components/nav/`, `neighbor-cart/README.md` |
+| Donor experience | `mulimangila` | `neighbor-cart/src/app/page.tsx`, `neighbor-cart/src/app/p/`, `neighbor-cart/src/components/donor/`, `neighbor-cart/src/lib/fees.ts` |
+| Partner portal, seed data, AI parsing, weather | `Viral-W` | `neighbor-cart/src/app/partner/`, `neighbor-cart/src/components/partner/`, `neighbor-cart/src/data/`, `neighbor-cart/src/lib/{ai,weather}.ts`, `neighbor-cart/src/app/api/{needs,parse-need,weather}/` |
