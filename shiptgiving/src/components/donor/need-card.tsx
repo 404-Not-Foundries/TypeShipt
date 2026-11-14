@@ -57,7 +57,7 @@ export function NeedCard({ need, partner, category, price, helpers, onFill, clas
         {price !== undefined && <p className="font-bold">about {formatUsd(price)} each</p>}
         <h3 className="line-clamp-2 text-[15px] leading-snug">{need.title}</h3>
         {partner && (
-          <Link href={`/p/${partner.id}`} className="flex items-center gap-1 text-[13px] text-secondary hover:text-primary hover:underline">
+          <Link href={`/p/${partner.id}`} className="-my-3 flex min-h-11 items-center gap-1 text-[13px] text-secondary hover:text-primary hover:underline">
             <span className="truncate">{partner.name}</span>
             {getVerification(partner.id).verified && (
               <span className="shrink-0 text-express" title="Verified nonprofit (IRS records)">
