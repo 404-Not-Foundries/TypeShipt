@@ -33,19 +33,20 @@ export default function GivePage() {
     );
   }, [state, partnerId, category, categoryOf]);
 
-  if (!state) return error ? <p role="alert" className="text-red-700">{error}</p> : <FeedSkeleton />;
+  if (!state) return error ? <p role="alert" className="text-sale">{error}</p> : <FeedSkeleton />;
 
   const partnersWithNeeds = state.partners.filter((p) => state.needs.some((n) => n.partnerId === p.id));
   const categories = [...new Set(state.needs.map((n) => categoryOf.get(n.itemId)).filter((c): c is string => !!c))].sort();
   const filling = state.needs.find((n) => n.id === fillingId);
 
   return (
-    <section className="space-y-5 text-neutral-900">
+    <section className="space-y-5 text-primary">
       <header>
-        <h1 className="text-2xl font-bold sm:text-3xl">What Birmingham needs today</h1>
-        <p className="mt-1 text-neutral-600">Fill a real need in a few taps: Shipt delivers, you drive it, or we pick it up from your porch.</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.08em] text-secondary">ShiptGiving · Birmingham</p>
+        <h1 className="mt-1 text-[32px] font-extrabold leading-[1.15] sm:text-[44px]">What Birmingham needs today</h1>
+        <p className="mt-1 text-secondary">Fill a real need in a few taps: Shipt delivers, you drive it, or we pick it up from your porch.</p>
       </header>
-      {error && <p role="alert" className="text-sm text-amber-700">{error}</p>}
+      {error && <p role="alert" className="text-sm text-secondary">{error}</p>}
       <WeatherBanner weather={state.weather} />
       <MyPledges ids={myIds} state={state} />
       <div className="space-y-2">
@@ -53,7 +54,7 @@ export default function GivePage() {
         <FilterChips label="Categories" value={category} onChange={setCategory} options={categories.map((c) => ({ value: c, label: c }))} />
       </div>
       {visible.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-black/15 p-8 text-center text-neutral-500">No needs match these filters right now.</p>
+        <p className="rounded-2xl border border-dashed border-hairline p-8 text-center text-secondary">No needs match these filters right now.</p>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {visible.map((n) => (

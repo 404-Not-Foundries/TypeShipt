@@ -92,21 +92,21 @@ export function FillSheet({ need, state, onClose, onPledged }: Props) {
         aria-labelledby="fill-title"
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
-        className="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-5 text-neutral-900 shadow-xl outline-none sm:rounded-3xl"
+        className="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-5 text-primary shadow-xl outline-none sm:rounded-3xl"
       >
         <div className="mb-3 flex items-start justify-between gap-3">
           <div>
             <h2 id="fill-title" className="text-lg font-bold">{need.title}</h2>
-            <p className="text-sm text-neutral-600">for {partner.name}</p>
+            <p className="text-sm text-secondary">for {partner.name}</p>
           </div>
-          <button type="button" onClick={onClose} aria-label="Close" className="rounded-full px-2 text-2xl leading-none text-neutral-500 hover:bg-neutral-100">×</button>
+          <button type="button" onClick={onClose} aria-label="Close" className="rounded-full px-2 text-2xl leading-none text-secondary hover:bg-surface-muted">×</button>
         </div>
 
         {done ? (
           <PledgeSuccess pledge={done} partner={partner} title={need.title} onClose={onClose} />
         ) : (
           <div className="space-y-4">
-            {remaining < 1 && <p role="status" className="rounded-xl bg-emerald-50 p-3 text-sm">Someone just filled the rest of this need. Thank you!</p>}
+            {remaining < 1 && <p role="status" className="rounded-xl bg-express p-3 text-express text-sm">Someone just filled the rest of this need. Thank you!</p>}
             <QuantityStepper value={qty} max={remaining} onChange={setQty} unitPrice={item?.price} />
             <DeliveryOptions
               partner={partner}
@@ -125,13 +125,13 @@ export function FillSheet({ need, state, onClose, onPledged }: Props) {
             />
             <label className="block text-sm">
               <span className="font-medium">Name on the acknowledgment</span>
-              <input value={donorName} onChange={(e) => setDonorName(e.target.value)} maxLength={60} placeholder="A neighbor" autoComplete="name" className="mt-1 w-full rounded-xl border border-black/15 px-3 py-2" />
+              <input value={donorName} onChange={(e) => setDonorName(e.target.value)} maxLength={60} placeholder="A neighbor" autoComplete="name" className="mt-1 w-full rounded-xl border border-hairline px-3 py-2" />
             </label>
-            {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
-            <button type="button" onClick={submit} disabled={busy || qty < 1} className="w-full rounded-full bg-emerald-700 py-3 font-semibold text-white hover:bg-emerald-800 disabled:bg-neutral-300">
+            {error && <p role="alert" className="text-sm text-sale">{error}</p>}
+            <button type="button" onClick={submit} disabled={busy || qty < 1} className="w-full rounded-full bg-primary py-3 font-semibold text-white hover:bg-black disabled:bg-hairline disabled:text-secondary">
               {busy ? "Sending…" : cta}
             </button>
-            {fulfillment === "shipt" && <p className="text-center text-xs text-neutral-500">Demo checkout. In production this is Shipt&apos;s gift-order checkout.</p>}
+            {fulfillment === "shipt" && <p className="text-center text-xs text-secondary">Demo checkout. In production this is Shipt&apos;s gift-order checkout.</p>}
           </div>
         )}
       </div>

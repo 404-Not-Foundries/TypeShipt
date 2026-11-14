@@ -17,13 +17,13 @@ export function PartnerView() {
   const [fillingId, setFillingId] = useState<string | null>(null);
   const [, addMyId] = useMyPledgeIds();
 
-  if (!state) return error ? <p role="alert" className="text-red-700">{error}</p> : <FeedSkeleton />;
+  if (!state) return error ? <p role="alert" className="text-sale">{error}</p> : <FeedSkeleton />;
   const partner = state.partners.find((p) => p.id === id);
   if (!partner) {
     return (
-      <div className="space-y-3 text-neutral-900">
+      <div className="space-y-3 text-primary">
         <h1 className="text-2xl font-bold">Partner not found</h1>
-        <Link href="/" className="text-emerald-700 underline">Back to all needs</Link>
+        <Link href="/" className="text-primary underline">Back to all needs</Link>
       </div>
     );
   }
@@ -34,13 +34,13 @@ export function PartnerView() {
   const filling = state.needs.find((n) => n.id === fillingId);
 
   return (
-    <article className="space-y-6 text-neutral-900">
-      <Link href="/" className="text-sm text-emerald-700 hover:underline">← All needs</Link>
+    <article className="space-y-6 text-primary">
+      <Link href="/" className="text-sm text-primary hover:underline">← All needs</Link>
       <PartnerFacts partner={partner} needs={needs} />
       <section aria-labelledby="open-needs" className="space-y-3">
         <h2 id="open-needs" className="text-lg font-semibold">Open needs ({open.length})</h2>
         {open.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-black/15 p-8 text-center text-neutral-500">Every need here is fully pledged. Thank you, Birmingham!</p>
+          <p className="rounded-2xl border border-dashed border-hairline p-8 text-center text-secondary">Every need here is fully pledged. Thank you, Birmingham!</p>
         ) : (
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {open.map((n) => (

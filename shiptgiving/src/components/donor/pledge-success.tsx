@@ -17,12 +17,12 @@ export function PledgeSuccess({ pledge, partner, title, onClose }: Props) {
       <p className="text-lg font-semibold">
         {pledge.qty} × {title} pledged to {partner.name}
       </p>
-      <p className="text-sm text-neutral-600">{NEXT[pledge.fulfillment]}</p>
+      <p className="text-sm text-secondary">{NEXT[pledge.fulfillment]}</p>
       {pledge.fulfillment === "volunteer" && <p className="text-sm">Drop-off: {dropOff(partner).address}</p>}
       <p className="text-sm">
         You pay: <strong>{formatUsd(amountCharged(pledge.cost, pledge.fulfillment))}</strong>
       </p>
-      <button type="button" onClick={onClose} className="w-full rounded-full bg-emerald-700 py-3 font-semibold text-white">
+      <button type="button" onClick={onClose} className="w-full rounded-full bg-primary py-3 font-semibold text-white">
         Done
       </button>
     </div>
