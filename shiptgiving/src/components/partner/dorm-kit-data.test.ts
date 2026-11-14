@@ -36,6 +36,11 @@ describe("dorm kit", () => {
     expect(kitPrice(lines)).toBe(29.99);
   });
 
+  it("never uses a bundled move-in kit as a towel line", () => {
+    const withBundle = [item("dorm-kit", "Dorm move-in kit (sheets, towels, hamper, desk lamp)", 89.99), ...catalog];
+    expect(resolveDormKit(withBundle).map((l) => l.item.id)).not.toContain("dorm-kit");
+  });
+
   it("scales quantities by the number of scholars", () => {
     const items = kitNeedItems(resolveDormKit(catalog), 3);
     expect(items.find((i) => i.itemId === "towel-bath")?.qty).toBe(6);

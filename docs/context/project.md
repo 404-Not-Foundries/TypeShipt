@@ -120,6 +120,7 @@ Shipt itself has no public consumer API, so "Send via Shipt" mocks Shipt's exist
 - **@anthropic-ai/sdk** (Claude) for need parsing only. `ANTHROPIC_API_KEY` goes in `.env.local`, with a keyword fallback when it's missing.
 - **OSRM public demo server** for drive times and route lines; **NWS api.weather.gov** for weather. Both are free and need no key. Send a generic `User-Agent`.
 - **State:** an in-memory store on the Next server (kept on `globalThis` so it survives hot reload). Every view polls `GET /api/state` every 2 seconds. No database.
+- **Design:** Shipt's design language, spec in `docs/context/shipt-design.md` (Part 2). Tokens live in `shiptgiving/src/app/globals.css` as Tailwind v4 theme colors; font is Plus Jakarta Sans via `next/font`. Light only, no dark mode.
 - **Tests:** Vitest for the routing engine and fee split only.
 - Run: `cd shiptgiving && npm install && npm run dev`, then open http://localhost:3000.
 
@@ -226,3 +227,4 @@ export type AppState = { partners: Partner[]; stores: Store[]; catalog: CatalogI
 - 11:15. The fee is shared only for delivery; items are paid per pledge. This keeps Shipt's billing unchanged.
 - 11:30. Renamed the product to **ShiptGiving**; the app folder is `shiptgiving/`.
 - 11:30. Added public retailer and grocery APIs (OSM stores, Open Food Facts, optional Kroger prices), so many real Birmingham stores appear as pickup points.
+- 12:10. Adopted Shipt's design language (`docs/context/shipt-design.md`): white canvas, near-black type, Totemeal bands, mint express pills, Target red for urgency only, full-pill CTAs, hairline cards, Plus Jakarta Sans. Shared tokens in `globals.css`.
