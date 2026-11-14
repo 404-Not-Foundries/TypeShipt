@@ -24,7 +24,7 @@ export function PartnerFacts({ partner, needs }: { partner: Partner; needs: Need
   return (
     <header className="space-y-4">
       <div>
-        <h1 className="text-[32px] font-extrabold leading-[1.15] sm:text-[40px]">{partner.name}</h1>
+        <h1 className="text-[28px] font-extrabold leading-[1.15] tracking-tight sm:text-4xl">{partner.name}</h1>
         <div className="mt-1 flex flex-wrap items-center gap-2">
           <span className="text-sm text-secondary">{partner.neighborhood}</span>
           <VerifiedBadge partnerId={partner.id} />
