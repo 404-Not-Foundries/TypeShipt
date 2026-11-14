@@ -6,13 +6,14 @@ const LINKS = [
   { href: "/", label: "Give" },
   { href: "/partner", label: "Partner" },
   { href: "/driver", label: "Driver" },
+  { href: "/impact", label: "Impact" },
 ];
 
 export function RoleNav() {
   const path = usePathname();
   return (
     <header className="sticky top-0 z-[1000] border-b border-black/10 bg-white/90 backdrop-blur">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3" aria-label="Main">
+      <nav className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-3" aria-label="Main">
         <Link href="/" className="text-lg font-bold tracking-tight text-emerald-700">
           ShiptGiving
         </Link>
