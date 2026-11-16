@@ -7,6 +7,7 @@
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![Deployed on Vercel](https://img.shields.io/badge/Vercel-live-000000?logo=vercel&logoColor=white)](https://shiptgiving.vercel.app)
 [![Tests: 121 passing](https://img.shields.io/badge/Vitest-121_tests_passing-6E9F18?logo=vitest&logoColor=white)](#tests-and-smoke-check)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
 **[Open the live demo →](https://shiptgiving.vercel.app)** · [What it does](#what-it-does) · [How it works](#how-it-works) · [Run it locally](#run-it-locally) · [Team](#team-and-roles)
 
@@ -340,3 +341,7 @@ Photos, map data and facts come from open sources:
 - **Map data** © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors; routing lines from [OSRM](https://project-osrm.org/).
 - **Data**: National Weather Service forecasts, IRS exempt-organization records via ProPublica Nonprofit Explorer, and the public websites of the 11 partner nonprofits.
 - **Shipt** is a trademark of its owner. This project uses a Shipt-inspired look for a concept demo and is not affiliated with Shipt.
+
+## License
+
+The code is released under the [MIT License](LICENSE). Item photos keep their own licenses, listed in [`item-images.ts`](shiptgiving/src/lib/item-images.ts).
